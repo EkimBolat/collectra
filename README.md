@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Collectra
 
-## Getting Started
+Koleksiyonlarını paylaşabildiğin, herkese açık ya da sadece takipçilerine özel gösterebildiğin,
+kategori bazlı keşfedilebilir bir koleksiyon paylaşım platformu.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 16 (App Router, TypeScript, Tailwind CSS 4)
+- Supabase (Postgres + Auth + Storage), Row Level Security ile görünürlük kontrolü
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Kurulum
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. [supabase.com](https://supabase.com) üzerinde ücretsiz bir proje oluştur.
+2. Proje ayarlarından **Project URL** ve **anon public key** değerlerini al
+   (Settings → API).
+3. `.env.local.example` dosyasını `.env.local` olarak kopyala ve değerleri doldur:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
-## Learn More
+4. Supabase panelinde **SQL Editor**'ü aç, [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql)
+   dosyasının tüm içeriğini yapıştırıp çalıştır. Bu, tabloları, RLS politikalarını,
+   storage bucket'larını ve kayıt olunca profil oluşturan trigger'ı kurar.
+5. (Önerilir, geliştirme kolaylığı için) Authentication → Providers → Email altında
+   **Confirm email**'i kapat, böylece kayıt olur olmaz giriş yapılabilir.
+6. Bağımlılıkları kur ve sunucuyu başlat:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+7. [http://localhost:3000](http://localhost:3000) adresini aç.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Veri modeli
 
-## Deploy on Vercel
+- **profiles** — kullanıcı adı, görünen ad, bio, avatar.
+- **collections** — bir koleksiyonun kendisi (başlık, kategori, görünürlük: `public` / `followers` / `private`).
+- **collection_items** — koleksiyona ait fotoğraflar; koleksiyon oluşturulduktan sonra da yeni parça eklenebilir.
+- **follows**, **likes**, **comments** — sosyal etkileşim.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Görünürlük kuralları veritabanı seviyesinde (RLS) uygulanır: `public` herkese,
+`followers` sadece takip edenlere, `private` sadece sahibine görünür.
