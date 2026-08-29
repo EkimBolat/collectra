@@ -1,12 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCollectionById } from "@/lib/data";
+import { getCollectionById, getComments } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import LikeButton from "@/components/LikeButton";
 import FollowButton from "@/components/FollowButton";
+import CommentsSection from "@/components/CommentsSection";
 import AddItemsForm from "./AddItemsForm";
+import DeleteItemButton from "./DeleteItemButton";
+import OwnerMenu from "./OwnerMenu";
 import { createClient } from "@/lib/supabase/server";
 
 const VISIBILITY_LABEL: Record<string, string> = {
@@ -51,16 +54,25 @@ export default async function CollectionDetailPage({
     following = Boolean(followRes.data);
   }
 
-  const items = [...collection.items].sort((a, b) => a.position - b.position);
+  const [items, comments] = await Promise.all([
+    Promise.resolve([...collection.items].sort((a, b) => a.position - b.position)),
+    getComments(collection.id),
+  ]);
   const path = `/c/${collection.id}`;
+  const ownerAvatarUrl = publicImageUrl("avatars", collection.owner.avatar_path);
 
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">{collection.title}</h1>
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-black/60 dark:text-white/60">
-            <Link href={`/u/${collection.owner.username}`} className="font-medium hover:underline">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold">{collection.title}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+            <Link href={`/u/${collection.owner.username}`} className="flex items-center gap-1.5 font-medium text-foreground hover:underline">
+              <span className="relative h-5 w-5 overflow-hidden rounded-full bg-accent-soft">
+                {ownerAvatarUrl && (
+                  <Image src={ownerAvatarUrl} alt={collection.owner.username} fill className="object-cover" />
+                )}
+              </span>
               @{collection.owner.username}
             </Link>
             <span>·</span>
@@ -73,7 +85,7 @@ export default async function CollectionDetailPage({
             <span>{collection.item_count} parça</span>
           </div>
           {collection.description && (
-            <p className="mt-3 whitespace-pre-wrap text-sm">{collection.description}</p>
+            <p className="mt-3 whitespace-pre-wrap text-sm text-foreground/90">{collection.description}</p>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -88,24 +100,28 @@ export default async function CollectionDetailPage({
           {profile && !isOwner && (
             <FollowButton targetUserId={collection.owner_id} path={path} following={following} />
           )}
+          {isOwner && <OwnerMenu collectionId={collection.id} />}
         </div>
       </div>
 
       {isOwner && (
-        <div className="mb-6 rounded-lg border border-dashed border-black/15 p-4 dark:border-white/20">
+        <div className="card mb-6 border-dashed p-4">
           <p className="mb-2 text-sm font-medium">Koleksiyonu genişlet</p>
           <AddItemsForm collectionId={collection.id} />
         </div>
       )}
 
       {items.length === 0 ? (
-        <p className="py-16 text-center text-black/50 dark:text-white/50">Henüz fotoğraf yok.</p>
+        <p className="py-16 text-center text-muted">Henüz fotoğraf yok.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {items.map((item) => {
             const url = publicImageUrl("collection-images", item.image_path);
             return (
-              <div key={item.id} className="relative aspect-square overflow-hidden rounded-md bg-black/5 dark:bg-white/5">
+              <div
+                key={item.id}
+                className="group relative aspect-square overflow-hidden rounded-xl bg-accent-soft"
+              >
                 {url && (
                   <Image
                     src={url}
@@ -115,11 +131,20 @@ export default async function CollectionDetailPage({
                     className="object-cover"
                   />
                 )}
+                {isOwner && (
+                  <DeleteItemButton
+                    collectionId={collection.id}
+                    itemId={item.id}
+                    imagePath={item.image_path}
+                  />
+                )}
               </div>
             );
           })}
         </div>
       )}
+
+      <CommentsSection collectionId={collection.id} comments={comments} canComment={Boolean(profile)} />
     </div>
   );
 }

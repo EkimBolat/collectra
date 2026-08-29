@@ -1,0 +1,15 @@
+import { redirect } from "next/navigation";
+import { getCurrentProfile } from "@/lib/auth";
+import SettingsForm from "./SettingsForm";
+
+export default async function SettingsPage() {
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/login");
+
+  return (
+    <div className="mx-auto w-full max-w-lg flex-1 px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">Profili düzenle</h1>
+      <SettingsForm profile={profile} />
+    </div>
+  );
+}

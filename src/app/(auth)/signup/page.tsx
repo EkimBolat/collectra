@@ -13,49 +13,42 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="mx-auto flex max-w-sm flex-1 flex-col justify-center px-4 py-16">
-      <h1 className="mb-6 text-2xl font-semibold">Kayıt ol</h1>
-      <form action={formAction} className="flex flex-col gap-4">
-        <input
-          name="display_name"
-          placeholder="Görünen ad"
-          required
-          className="rounded-md border border-black/10 px-3 py-2 outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
-        />
-        <input
-          name="username"
-          placeholder="kullanici_adi"
-          pattern="[a-z0-9_]{3,24}"
-          required
-          className="rounded-md border border-black/10 px-3 py-2 outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="E-posta"
-          required
-          className="rounded-md border border-black/10 px-3 py-2 outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Şifre (en az 6 karakter)"
-          minLength={6}
-          required
-          className="rounded-md border border-black/10 px-3 py-2 outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/40"
-        />
-        {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-foreground px-3 py-2 font-medium text-background disabled:opacity-50"
-        >
-          {pending ? "Kaydediliyor..." : "Kayıt ol"}
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-black/60 dark:text-white/60">
+    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
+      <div className="card p-7">
+        <div className="mb-6 flex flex-col items-center gap-2 text-center">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-xl text-accent-foreground">
+            ✺
+          </span>
+          <h1 className="text-xl font-bold">Collectra&apos;ya katıl</h1>
+          <p className="text-sm text-muted">Koleksiyonunu paylaşmaya başla</p>
+        </div>
+        <form action={formAction} className="flex flex-col gap-3">
+          <input name="display_name" placeholder="Görünen ad" required className="field" />
+          <input
+            name="username"
+            placeholder="kullanici_adi"
+            pattern="[a-z0-9_]{3,24}"
+            required
+            className="field"
+          />
+          <input name="email" type="email" placeholder="E-posta" required className="field" />
+          <input
+            name="password"
+            type="password"
+            placeholder="Şifre (en az 6 karakter)"
+            minLength={6}
+            required
+            className="field"
+          />
+          {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+          <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
+            {pending ? "Kaydediliyor..." : "Kayıt ol"}
+          </button>
+        </form>
+      </div>
+      <p className="mt-5 text-center text-sm text-muted">
         Zaten hesabın var mı?{" "}
-        <Link href="/login" className="font-medium underline">
+        <Link href="/login" className="font-semibold text-accent hover:underline">
           Giriş yap
         </Link>
       </p>

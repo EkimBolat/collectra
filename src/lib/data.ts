@@ -104,6 +104,23 @@ export async function isFollowing(followerId: string, followingId: string) {
   return Boolean(data);
 }
 
+export async function getComments(collectionId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("comments")
+    .select("id, body, created_at, user:profiles(id, username, display_name, avatar_path)")
+    .eq("collection_id", collectionId)
+    .order("created_at", { ascending: true });
+
+  if (error) return [];
+  return data as unknown as {
+    id: string;
+    body: string;
+    created_at: string;
+    user: { id: string; username: string; display_name: string; avatar_path: string | null };
+  }[];
+}
+
 export async function hasLiked(userId: string, collectionId: string) {
   const supabase = await createClient();
   const { data } = await supabase

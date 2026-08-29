@@ -16,25 +16,14 @@ export default async function ExplorePage({
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
       <div className="mb-6 flex flex-wrap gap-2">
-        <Link
-          href="/"
-          className={`rounded-full border px-3 py-1.5 text-sm ${
-            !category
-              ? "border-foreground bg-foreground text-background"
-              : "border-black/10 dark:border-white/15"
-          }`}
-        >
+        <Link href="/" className={category ? "chip chip-idle" : "chip chip-active"}>
           Tümü
         </Link>
         {categories.map((c) => (
           <Link
             key={c.id}
             href={`/?category=${c.slug}`}
-            className={`rounded-full border px-3 py-1.5 text-sm ${
-              category === c.slug
-                ? "border-foreground bg-foreground text-background"
-                : "border-black/10 dark:border-white/15"
-            }`}
+            className={category === c.slug ? "chip chip-active" : "chip chip-idle"}
           >
             {c.emoji} {c.name}
           </Link>
@@ -42,9 +31,10 @@ export default async function ExplorePage({
       </div>
 
       {collections.length === 0 ? (
-        <p className="py-16 text-center text-black/50 dark:text-white/50">
-          Henüz bu kategoride koleksiyon yok. İlk paylaşan sen ol!
-        </p>
+        <div className="card flex flex-col items-center gap-2 px-4 py-20 text-center">
+          <span className="text-3xl">🗃️</span>
+          <p className="text-muted">Henüz bu kategoride koleksiyon yok. İlk paylaşan sen ol!</p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {collections.map((c) => (

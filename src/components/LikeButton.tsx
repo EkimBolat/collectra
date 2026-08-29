@@ -20,13 +20,12 @@ export default function LikeButton({
     <button
       onClick={() => startTransition(() => toggleLike(collectionId, path))}
       disabled={pending}
-      className={`rounded-full border px-4 py-1.5 text-sm font-medium disabled:opacity-50 ${
-        liked
-          ? "border-red-500 bg-red-500 text-white"
-          : "border-black/15 dark:border-white/20"
-      }`}
+      className={liked ? "btn bg-danger text-white hover:brightness-110" : "btn btn-secondary"}
     >
-      {liked ? "♥" : "♡"} {count}
+      <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current">
+        <path d="M10 17.5s-6.5-4-8.5-8A4.5 4.5 0 0110 5.5 4.5 4.5 0 0118.5 9.5c-2 4-8.5 8-8.5 8z" />
+      </svg>
+      {count}
     </button>
   );
 }

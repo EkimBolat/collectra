@@ -1,13 +1,19 @@
 "use client";
 
 import { useActionState } from "react";
-import type { Category } from "@/lib/types";
-import { createCollection } from "./actions";
+import type { Category, Collection } from "@/lib/types";
+import { updateCollection } from "../actions";
 
-export default function NewCollectionForm({ categories }: { categories: Category[] }) {
+export default function EditCollectionForm({
+  collection,
+  categories,
+}: {
+  collection: Collection;
+  categories: Category[];
+}) {
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | undefined, formData: FormData) => {
-      return (await createCollection(formData)) ?? {};
+      return (await updateCollection(collection.id, formData)) ?? {};
     },
     undefined,
   );
@@ -16,12 +22,7 @@ export default function NewCollectionForm({ categories }: { categories: Category
     <form action={formAction} className="card flex flex-col gap-4 p-6">
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">Başlık</label>
-        <input
-          name="title"
-          required
-          placeholder="Örn: Lego Uzay Koleksiyonum"
-          className="field"
-        />
+        <input name="title" required defaultValue={collection.title} className="field" />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -29,17 +30,14 @@ export default function NewCollectionForm({ categories }: { categories: Category
         <textarea
           name="description"
           rows={3}
-          placeholder="Koleksiyonun hakkında birkaç cümle..."
+          defaultValue={collection.description ?? ""}
           className="field resize-none"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">Kategori</label>
-        <select name="category_id" required defaultValue="" className="field">
-          <option value="" disabled>
-            Seç
-          </option>
+        <select name="category_id" defaultValue={collection.category_id} className="field">
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.emoji} {c.name}
@@ -50,32 +48,17 @@ export default function NewCollectionForm({ categories }: { categories: Category
 
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">Görünürlük</label>
-        <select name="visibility" defaultValue="public" className="field">
+        <select name="visibility" defaultValue={collection.visibility} className="field">
           <option value="public">Herkese açık</option>
           <option value="followers">Sadece takipçilerim</option>
           <option value="private">Gizli (sadece ben)</option>
         </select>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium">Fotoğraflar</label>
-        <input
-          name="images"
-          type="file"
-          accept="image/*"
-          multiple
-          required
-          className="field file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent"
-        />
-        <p className="text-xs text-muted">
-          Birden fazla fotoğraf seçebilirsin. Koleksiyonuna sonradan da parça ekleyebilirsin.
-        </p>
-      </div>
-
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
 
       <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
-        {pending ? "Yükleniyor..." : "Koleksiyonu paylaş"}
+        {pending ? "Kaydediliyor..." : "Kaydet"}
       </button>
     </form>
   );

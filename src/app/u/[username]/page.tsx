@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProfileByUsername, getProfileCollections, getFollowCounts } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
@@ -41,25 +42,31 @@ export default async function ProfilePage({
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
       <div className="mb-8 flex items-center gap-6">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+        <span className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-accent-soft ring-2 ring-border">
           {avatarUrl && (
             <Image src={avatarUrl} alt={profile.username} fill className="object-cover" />
           )}
-        </div>
+        </span>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold">{profile.display_name}</h1>
-            {viewer && !isOwnProfile && (
-              <FollowButton
-                targetUserId={profile.id}
-                path={`/u/${profile.username}`}
-                following={following}
-              />
+            <h1 className="text-xl font-bold">{profile.display_name}</h1>
+            {isOwnProfile ? (
+              <Link href="/settings" className="btn btn-secondary">
+                Profili düzenle
+              </Link>
+            ) : (
+              viewer && (
+                <FollowButton
+                  targetUserId={profile.id}
+                  path={`/u/${profile.username}`}
+                  following={following}
+                />
+              )
             )}
           </div>
-          <p className="text-sm text-black/50 dark:text-white/50">@{profile.username}</p>
+          <p className="text-sm text-muted">@{profile.username}</p>
           {profile.bio && <p className="mt-2 text-sm">{profile.bio}</p>}
-          <div className="mt-2 flex gap-4 text-sm text-black/60 dark:text-white/60">
+          <div className="mt-3 flex gap-5 text-sm text-muted">
             <span>
               <strong className="text-foreground">{collections.length}</strong> koleksiyon
             </span>
@@ -74,9 +81,10 @@ export default async function ProfilePage({
       </div>
 
       {collections.length === 0 ? (
-        <p className="py-16 text-center text-black/50 dark:text-white/50">
-          Henüz koleksiyon paylaşılmamış.
-        </p>
+        <div className="card flex flex-col items-center gap-2 px-4 py-20 text-center">
+          <span className="text-3xl">🗃️</span>
+          <p className="text-muted">Henüz koleksiyon paylaşılmamış.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {collections.map((c) => (

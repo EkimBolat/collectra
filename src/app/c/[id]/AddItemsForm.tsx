@@ -22,16 +22,12 @@ export default function AddItemsForm({ collectionId }: { collectionId: string })
         accept="image/*"
         multiple
         required
-        className="text-sm file:mr-3 file:rounded file:border-0 file:bg-black/5 file:px-2 file:py-1 dark:file:bg-white/10"
+        className="text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent"
       />
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="btn btn-primary">
         {pending ? "Yükleniyor..." : "Koleksiyonu genişlet"}
       </button>
-      {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
     </form>
   );
 }
