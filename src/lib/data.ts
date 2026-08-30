@@ -89,6 +89,41 @@ export async function getLikedCollections(userId: string) {
     .filter((c): c is CollectionWithRelations => c !== null);
 }
 
+type FollowListProfile = Pick<
+  import("@/lib/types").Profile,
+  "id" | "username" | "display_name" | "avatar_path"
+>;
+
+export async function getFollowers(profileId: string): Promise<FollowListProfile[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("follows")
+    .select("follower:profiles!follows_follower_id_fkey(id, username, display_name, avatar_path)")
+    .eq("following_id", profileId)
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+  return (data as unknown as { follower: FollowListProfile }[])
+    .map((row) => row.follower)
+    .filter(Boolean);
+}
+
+export async function getFollowing(profileId: string): Promise<FollowListProfile[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("follows")
+    .select(
+      "following:profiles!follows_following_id_fkey(id, username, display_name, avatar_path)",
+    )
+    .eq("follower_id", profileId)
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+  return (data as unknown as { following: FollowListProfile }[])
+    .map((row) => row.following)
+    .filter(Boolean);
+}
+
 export async function getFollowCounts(profileId: string) {
   const supabase = await createClient();
   const [followers, following] = await Promise.all([

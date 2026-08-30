@@ -4,6 +4,8 @@ import {
   getProfileByUsername,
   getProfileCollections,
   getLikedCollections,
+  getFollowers,
+  getFollowing,
   getFollowCounts,
 } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
@@ -12,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getDict } from "@/lib/i18n";
 import CollectionCard from "@/components/CollectionCard";
 import FollowButton from "@/components/FollowButton";
+import FollowListModal from "@/components/FollowListModal";
 import Image from "next/image";
 
 export default async function ProfilePage({
@@ -19,10 +22,10 @@ export default async function ProfilePage({
   searchParams,
 }: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; panel?: string }>;
 }) {
   const { username } = await params;
-  const { tab } = await searchParams;
+  const { tab, panel } = await searchParams;
   const profile = await getProfileByUsername(username);
   if (!profile) notFound();
 
@@ -51,6 +54,7 @@ export default async function ProfilePage({
   }
 
   const avatarUrl = publicImageUrl("avatars", profile.avatar_path);
+  const profileUrl = `/u/${profile.username}`;
 
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
@@ -71,7 +75,7 @@ export default async function ProfilePage({
               viewer && (
                 <FollowButton
                   targetUserId={profile.id}
-                  path={`/u/${profile.username}`}
+                  path={profileUrl}
                   following={following}
                 />
               )
@@ -83,12 +87,12 @@ export default async function ProfilePage({
             <span>
               <strong className="text-foreground">{collections.length}</strong> {t.profile.collections}
             </span>
-            <span>
+            <Link href={`${profileUrl}?panel=followers`} className="hover:text-foreground hover:underline">
               <strong className="text-foreground">{counts.followers}</strong> {t.profile.followers}
-            </span>
-            <span>
+            </Link>
+            <Link href={`${profileUrl}?panel=following`} className="hover:text-foreground hover:underline">
               <strong className="text-foreground">{counts.following}</strong> {t.profile.following}
-            </span>
+            </Link>
           </div>
         </div>
       </div>
@@ -96,13 +100,13 @@ export default async function ProfilePage({
       {isOwnProfile && (
         <div className="mb-6 flex gap-2">
           <Link
-            href={`/u/${profile.username}`}
+            href={profileUrl}
             className={!showLiked ? "chip chip-active" : "chip chip-idle"}
           >
             {t.profile.collectionsTab}
           </Link>
           <Link
-            href={`/u/${profile.username}?tab=likes`}
+            href={`${profileUrl}?tab=likes`}
             className={showLiked ? "chip chip-active" : "chip chip-idle"}
           >
             ♥ {t.profile.likedTab}
@@ -121,6 +125,23 @@ export default async function ProfilePage({
             <CollectionCard key={c.id} collection={c} locale={locale} />
           ))}
         </div>
+      )}
+
+      {panel === "followers" && (
+        <FollowListModal
+          title={t.profile.followersTitle}
+          people={await getFollowers(profile.id)}
+          emptyText={t.profile.noFollowers}
+          closeHref={profileUrl}
+        />
+      )}
+      {panel === "following" && (
+        <FollowListModal
+          title={t.profile.followingTitle}
+          people={await getFollowing(profile.id)}
+          emptyText={t.profile.noFollowing}
+          closeHref={profileUrl}
+        />
       )}
     </div>
   );

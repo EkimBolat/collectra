@@ -103,6 +103,10 @@ export const dictionaries = {
       collectionsTab: "Koleksiyonlar",
       likedTab: "Beğendiklerim",
       emptyLiked: "Henüz bir koleksiyon beğenmedin.",
+      followersTitle: "Takipçiler",
+      followingTitle: "Takip edilenler",
+      noFollowers: "Henüz takipçi yok.",
+      noFollowing: "Henüz kimse takip edilmiyor.",
     },
     settings: {
       pageTitle: "Profili düzenle",
@@ -220,6 +224,10 @@ export const dictionaries = {
       collectionsTab: "Collections",
       likedTab: "Liked",
       emptyLiked: "You haven't liked any collections yet.",
+      followersTitle: "Followers",
+      followingTitle: "Following",
+      noFollowers: "No followers yet.",
+      noFollowing: "Not following anyone yet.",
     },
     settings: {
       pageTitle: "Edit profile",
