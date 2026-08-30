@@ -4,10 +4,12 @@ import { useActionState } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { publicImageUrl } from "@/lib/supabase/storage";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import type { Profile } from "@/lib/types";
 import { updateProfile } from "./actions";
 
 export default function SettingsForm({ profile }: { profile: Profile }) {
+  const { t } = useLocale();
   const [preview, setPreview] = useState<string | null>(
     publicImageUrl("avatars", profile.avatar_path),
   );
@@ -25,7 +27,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
           {preview && <Image src={preview} alt="Avatar" fill className="object-cover" />}
         </span>
         <label className="btn btn-secondary cursor-pointer">
-          Fotoğraf seç
+          {t.settings.chooseFile}
           <input
             name="avatar"
             type="file"
@@ -40,7 +42,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium">Görünen ad</label>
+        <label className="text-sm font-medium">{t.settings.displayNameLabel}</label>
         <input
           name="display_name"
           required
@@ -50,13 +52,13 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium">Bio</label>
+        <label className="text-sm font-medium">{t.settings.bioLabel}</label>
         <textarea
           name="bio"
           rows={3}
           maxLength={300}
           defaultValue={profile.bio ?? ""}
-          placeholder="Koleksiyonun hakkında birkaç cümle..."
+          placeholder={t.settings.bioPlaceholder}
           className="field resize-none"
         />
       </div>
@@ -64,7 +66,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
 
       <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
-        {pending ? "Kaydediliyor..." : "Kaydet"}
+        {pending ? t.settings.savePending : t.settings.save}
       </button>
     </form>
   );

@@ -4,9 +4,11 @@ import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getDict } from "@/lib/i18n";
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
+  const { t } = await getDict();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -16,7 +18,7 @@ export async function updateProfile(formData: FormData) {
   const bio = String(formData.get("bio") ?? "").trim();
   const avatarFile = formData.get("avatar");
 
-  if (!displayName) return { error: "Görünen ad boş olamaz." };
+  if (!displayName) return { error: t.settings.errorDisplayNameRequired };
 
   const update: Record<string, string | null> = {
     display_name: displayName,
@@ -40,7 +42,7 @@ export async function updateProfile(formData: FormData) {
     .select("username")
     .single();
 
-  if (!profile) return { error: "Profil güncellenemedi." };
+  if (!profile) return { error: t.settings.errorGeneric };
 
   revalidatePath(`/u/${profile.username}`);
   redirect(`/u/${profile.username}`);

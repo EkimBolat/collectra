@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
+import { categoryName, type Locale } from "@/lib/i18n";
 import type { CollectionWithRelations } from "@/lib/types";
 
 export default function CollectionCard({
   collection,
+  locale,
 }: {
   collection: CollectionWithRelations;
+  locale: Locale;
 }) {
   const cover = [...collection.items].sort((a, b) => a.position - b.position)[0];
   const coverUrl = publicImageUrl("collection-images", cover?.image_path ?? null);
@@ -43,7 +46,8 @@ export default function CollectionCard({
       <div className="flex flex-1 flex-col gap-1 p-3.5">
         <p className="line-clamp-1 font-semibold">{collection.title}</p>
         <p className="text-xs text-muted">
-          {collection.category.emoji} {collection.category.name}
+          {collection.category.emoji}{" "}
+          {categoryName(collection.category.slug, locale, collection.category.name)}
         </p>
         <div className="mt-1.5 flex items-center justify-between text-xs text-muted">
           <span>@{collection.owner.username}</span>

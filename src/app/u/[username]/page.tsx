@@ -4,6 +4,7 @@ import { getProfileByUsername, getProfileCollections, getFollowCounts } from "@/
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { createClient } from "@/lib/supabase/server";
+import { getDict } from "@/lib/i18n";
 import CollectionCard from "@/components/CollectionCard";
 import FollowButton from "@/components/FollowButton";
 import Image from "next/image";
@@ -17,7 +18,7 @@ export default async function ProfilePage({
   const profile = await getProfileByUsername(username);
   if (!profile) notFound();
 
-  const viewer = await getCurrentProfile();
+  const [viewer, { t, locale }] = await Promise.all([getCurrentProfile(), getDict()]);
   const isOwnProfile = viewer?.id === profile.id;
 
   const [collections, counts] = await Promise.all([
@@ -52,7 +53,7 @@ export default async function ProfilePage({
             <h1 className="text-xl font-bold">{profile.display_name}</h1>
             {isOwnProfile ? (
               <Link href="/settings" className="btn btn-secondary">
-                Profili düzenle
+                {t.profile.editProfile}
               </Link>
             ) : (
               viewer && (
@@ -68,13 +69,13 @@ export default async function ProfilePage({
           {profile.bio && <p className="mt-2 text-sm">{profile.bio}</p>}
           <div className="mt-3 flex gap-5 text-sm text-muted">
             <span>
-              <strong className="text-foreground">{collections.length}</strong> koleksiyon
+              <strong className="text-foreground">{collections.length}</strong> {t.profile.collections}
             </span>
             <span>
-              <strong className="text-foreground">{counts.followers}</strong> takipçi
+              <strong className="text-foreground">{counts.followers}</strong> {t.profile.followers}
             </span>
             <span>
-              <strong className="text-foreground">{counts.following}</strong> takip
+              <strong className="text-foreground">{counts.following}</strong> {t.profile.following}
             </span>
           </div>
         </div>
@@ -83,12 +84,12 @@ export default async function ProfilePage({
       {collections.length === 0 ? (
         <div className="card flex flex-col items-center gap-2 px-4 py-20 text-center">
           <span className="text-3xl">🗃️</span>
-          <p className="text-muted">Henüz koleksiyon paylaşılmamış.</p>
+          <p className="text-muted">{t.profile.empty}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {collections.map((c) => (
-            <CollectionCard key={c.id} collection={c} />
+            <CollectionCard key={c.id} collection={c} locale={locale} />
           ))}
         </div>
       )}

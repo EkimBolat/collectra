@@ -3,23 +3,25 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getDict } from "@/lib/i18n";
 import type { CollectionVisibility } from "@/lib/types";
 
 export async function addComment(collectionId: string, formData: FormData) {
   const supabase = await createClient();
+  const { t } = await getDict();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const body = String(formData.get("body") ?? "").trim();
-  if (!body) return { error: "Yorum boş olamaz." };
+  if (!body) return { error: t.collection.commentEmpty };
 
   const { error } = await supabase
     .from("comments")
     .insert({ collection_id: collectionId, user_id: user.id, body });
 
-  if (error) return { error: "Yorum eklenemedi." };
+  if (error) return { error: t.collection.commentError };
 
   revalidatePath(`/c/${collectionId}`);
   return { success: true };
@@ -27,6 +29,7 @@ export async function addComment(collectionId: string, formData: FormData) {
 
 export async function updateCollection(collectionId: string, formData: FormData) {
   const supabase = await createClient();
+  const { t } = await getDict();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -37,8 +40,8 @@ export async function updateCollection(collectionId: string, formData: FormData)
   const categoryId = Number(formData.get("category_id"));
   const visibility = String(formData.get("visibility") ?? "public") as CollectionVisibility;
 
-  if (!title) return { error: "Başlık gerekli." };
-  if (!categoryId) return { error: "Kategori seç." };
+  if (!title) return { error: t.newCollection.errorTitleRequired };
+  if (!categoryId) return { error: t.newCollection.errorCategoryRequired };
 
   const { error } = await supabase
     .from("collections")
@@ -51,7 +54,7 @@ export async function updateCollection(collectionId: string, formData: FormData)
     .eq("id", collectionId)
     .eq("owner_id", user.id);
 
-  if (error) return { error: "Güncellenemedi: " + error.message };
+  if (error) return { error: t.editCollection.errorGeneric + ` (${error.message})` };
 
   revalidatePath(`/c/${collectionId}`);
   revalidatePath("/");

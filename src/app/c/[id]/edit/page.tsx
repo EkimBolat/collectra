@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getCollectionById, getCategories } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
+import { getDict } from "@/lib/i18n";
 import EditCollectionForm from "./EditCollectionForm";
 
 export default async function EditCollectionPage({
@@ -15,12 +16,12 @@ export default async function EditCollectionPage({
   const profile = await getCurrentProfile();
   if (!profile || profile.id !== collection.owner_id) redirect(`/c/${id}`);
 
-  const categories = await getCategories();
+  const [categories, { t, locale }] = await Promise.all([getCategories(), getDict()]);
 
   return (
     <div className="mx-auto w-full max-w-lg flex-1 px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">Koleksiyonu düzenle</h1>
-      <EditCollectionForm collection={collection} categories={categories} />
+      <h1 className="mb-6 text-2xl font-bold">{t.editCollection.pageTitle}</h1>
+      <EditCollectionForm collection={collection} categories={categories} locale={locale} />
     </div>
   );
 }

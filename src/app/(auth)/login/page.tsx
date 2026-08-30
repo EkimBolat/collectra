@@ -2,9 +2,11 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { signIn } from "../actions";
 
 export default function LoginPage() {
+  const { t } = useLocale();
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | undefined, formData: FormData) => {
       return (await signIn(formData)) ?? {};
@@ -19,28 +21,28 @@ export default function LoginPage() {
           <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl text-xl text-accent-foreground">
             ✺
           </span>
-          <h1 className="text-xl font-bold">Tekrar hoş geldin</h1>
-          <p className="text-sm text-muted">Koleksiyonlarına giriş yap</p>
+          <h1 className="text-xl font-bold">{t.auth.loginTitle}</h1>
+          <p className="text-sm text-muted">{t.auth.loginSubtitle}</p>
         </div>
         <form action={formAction} className="flex flex-col gap-3">
-          <input name="email" type="email" placeholder="E-posta" required className="field" />
+          <input name="email" type="email" placeholder={t.auth.email} required className="field" />
           <input
             name="password"
             type="password"
-            placeholder="Şifre"
+            placeholder={t.auth.password}
             required
             className="field"
           />
           {state?.error && <p className="text-sm text-danger">{state.error}</p>}
           <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
-            {pending ? "Giriş yapılıyor..." : "Giriş yap"}
+            {pending ? t.auth.loginButtonPending : t.auth.loginButton}
           </button>
         </form>
       </div>
       <p className="mt-5 text-center text-sm text-muted">
-        Hesabın yok mu?{" "}
+        {t.auth.noAccount}{" "}
         <Link href="/signup" className="font-semibold text-accent hover:underline">
-          Kayıt ol
+          {t.nav.signup}
         </Link>
       </p>
     </div>

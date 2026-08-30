@@ -2,17 +2,19 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getDict } from "@/lib/i18n";
 
 export async function signUp(formData: FormData) {
+  const { t } = await getDict();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const username = String(formData.get("username") ?? "").trim().toLowerCase();
 
   if (!/^[a-z0-9_]{3,24}$/.test(username)) {
-    return { error: "Kullanıcı adı 3-24 karakter olmalı, sadece küçük harf/rakam/_ içerebilir." };
+    return { error: t.auth.usernameInvalid };
   }
   if (password.length < 6) {
-    return { error: "Şifre en az 6 karakter olmalı." };
+    return { error: t.auth.passwordTooShort };
   }
 
   const supabase = await createClient();
@@ -24,7 +26,7 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     if (error.message.includes("duplicate") || error.code === "23505") {
-      return { error: "Bu kullanıcı adı zaten alınmış." };
+      return { error: t.auth.usernameTaken };
     }
     return { error: error.message };
   }
@@ -33,6 +35,7 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signIn(formData: FormData) {
+  const { t } = await getDict();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
@@ -40,7 +43,7 @@ export async function signIn(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: "E-posta veya şifre hatalı." };
+    return { error: t.auth.invalidCredentials };
   }
 
   redirect("/");

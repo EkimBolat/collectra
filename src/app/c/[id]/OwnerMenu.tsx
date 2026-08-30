@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { deleteCollection } from "./actions";
 
 export default function OwnerMenu({ collectionId }: { collectionId: string }) {
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -13,7 +15,7 @@ export default function OwnerMenu({ collectionId }: { collectionId: string }) {
       <button
         onClick={() => setOpen((o) => !o)}
         className="btn btn-secondary !px-2.5"
-        aria-label="Koleksiyon menüsü"
+        aria-label={t.collection.menu}
       >
         ⋯
       </button>
@@ -23,18 +25,18 @@ export default function OwnerMenu({ collectionId }: { collectionId: string }) {
             href={`/c/${collectionId}/edit`}
             className="block px-4 py-2.5 text-sm hover:bg-black/[.03] dark:hover:bg-white/[.06]"
           >
-            Düzenle
+            {t.collection.edit}
           </Link>
           <button
             disabled={pending}
             onClick={() => {
-              if (confirm("Bu koleksiyonu silmek istediğine emin misin? Bu işlem geri alınamaz.")) {
+              if (confirm(t.collection.deleteConfirm)) {
                 startTransition(() => deleteCollection(collectionId));
               }
             }}
             className="block w-full px-4 py-2.5 text-left text-sm text-danger hover:bg-danger/10 disabled:opacity-50"
           >
-            {pending ? "Siliniyor..." : "Sil"}
+            {pending ? t.collection.deletePending : t.collection.delete}
           </button>
         </div>
       )}

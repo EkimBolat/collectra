@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { toggleFollow } from "@/app/social-actions";
 
 export default function FollowButton({
@@ -12,6 +13,7 @@ export default function FollowButton({
   path: string;
   following: boolean;
 }) {
+  const { t } = useLocale();
   const [pending, startTransition] = useTransition();
 
   return (
@@ -20,7 +22,7 @@ export default function FollowButton({
       disabled={pending}
       className={following ? "btn btn-secondary" : "btn btn-primary"}
     >
-      {following ? "Takip ediliyor" : "Takip et"}
+      {following ? t.profile.unfollow : t.profile.follow}
     </button>
   );
 }

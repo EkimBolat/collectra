@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getDict } from "@/lib/i18n";
 import type { CollectionVisibility } from "@/lib/types";
 
 async function uploadImages(
@@ -34,6 +35,7 @@ async function uploadImages(
 
 export async function createCollection(formData: FormData) {
   const supabase = await createClient();
+  const { t } = await getDict();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -45,10 +47,10 @@ export async function createCollection(formData: FormData) {
   const visibility = String(formData.get("visibility") ?? "public") as CollectionVisibility;
   const files = formData.getAll("images").filter((f): f is File => f instanceof File);
 
-  if (!title) return { error: "Başlık gerekli." };
-  if (!categoryId) return { error: "Kategori seç." };
+  if (!title) return { error: t.newCollection.errorTitleRequired };
+  if (!categoryId) return { error: t.newCollection.errorCategoryRequired };
   if (files.filter((f) => f.size > 0).length === 0) {
-    return { error: "En az bir fotoğraf ekle." };
+    return { error: t.newCollection.errorNoPhotos };
   }
 
   const { data: collection, error: insertError } = await supabase
@@ -64,7 +66,7 @@ export async function createCollection(formData: FormData) {
     .single();
 
   if (insertError || !collection) {
-    return { error: "Koleksiyon oluşturulamadı: " + insertError?.message };
+    return { error: t.newCollection.errorGeneric + (insertError ? ` (${insertError.message})` : "") };
   }
 
   const uploaded = await uploadImages(supabase, user.id, collection.id, files);
@@ -85,6 +87,7 @@ export async function createCollection(formData: FormData) {
 
 export async function addItems(collectionId: string, formData: FormData) {
   const supabase = await createClient();
+  const { t } = await getDict();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -92,7 +95,7 @@ export async function addItems(collectionId: string, formData: FormData) {
 
   const files = formData.getAll("images").filter((f): f is File => f instanceof File);
   if (files.filter((f) => f.size > 0).length === 0) {
-    return { error: "En az bir fotoğraf seç." };
+    return { error: t.collection.errorNoPhotos };
   }
 
   const { count } = await supabase

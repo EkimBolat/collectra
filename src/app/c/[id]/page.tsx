@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getCollectionById, getComments } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
+import { getDict, categoryName, collectionTimeLabel } from "@/lib/i18n";
 import LikeButton from "@/components/LikeButton";
 import FollowButton from "@/components/FollowButton";
 import CommentsSection from "@/components/CommentsSection";
@@ -11,12 +12,6 @@ import AddItemsForm from "./AddItemsForm";
 import PhotoGrid from "./PhotoGrid";
 import OwnerMenu from "./OwnerMenu";
 import { createClient } from "@/lib/supabase/server";
-
-const VISIBILITY_LABEL: Record<string, string> = {
-  public: "Herkese açık",
-  followers: "Takipçilere özel",
-  private: "Gizli",
-};
 
 export default async function CollectionDetailPage({
   params,
@@ -27,7 +22,7 @@ export default async function CollectionDetailPage({
   const collection = await getCollectionById(id);
   if (!collection) notFound();
 
-  const profile = await getCurrentProfile();
+  const [profile, { t, locale }] = await Promise.all([getCurrentProfile(), getDict()]);
   const isOwner = profile?.id === collection.owner_id;
 
   let liked = false;
@@ -60,6 +55,8 @@ export default async function CollectionDetailPage({
   ]);
   const path = `/c/${collection.id}`;
   const ownerAvatarUrl = publicImageUrl("avatars", collection.owner.avatar_path);
+  const visibilityLabel = t.visibility[collection.visibility];
+  const timeLabel = collectionTimeLabel(collection.created_at, collection.updated_at, locale);
 
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
@@ -77,12 +74,14 @@ export default async function CollectionDetailPage({
             </Link>
             <span>·</span>
             <span>
-              {collection.category.emoji} {collection.category.name}
+              {collection.category.emoji} {categoryName(collection.category.slug, locale, collection.category.name)}
             </span>
             <span>·</span>
-            <span>{VISIBILITY_LABEL[collection.visibility]}</span>
+            <span>{visibilityLabel}</span>
             <span>·</span>
-            <span>{collection.item_count} parça</span>
+            <span>{t.collection.itemsCount(collection.item_count)}</span>
+            <span>·</span>
+            <span>{timeLabel}</span>
           </div>
           {collection.description && (
             <p className="mt-3 whitespace-pre-wrap text-sm text-foreground/90">{collection.description}</p>
@@ -106,7 +105,7 @@ export default async function CollectionDetailPage({
 
       {isOwner && (
         <div className="card mb-6 border-dashed p-4">
-          <p className="mb-2 text-sm font-medium">Koleksiyonu genişlet</p>
+          <p className="mb-2 text-sm font-medium">{t.collection.expandTitle}</p>
           <AddItemsForm collectionId={collection.id} />
         </div>
       )}

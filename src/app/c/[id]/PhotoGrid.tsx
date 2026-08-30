@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import DeleteItemButton from "./DeleteItemButton";
 
 type Item = {
@@ -22,6 +23,7 @@ export default function PhotoGrid({
   isOwner: boolean;
   title: string;
 }) {
+  const { t } = useLocale();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function PhotoGrid({
   }, [openIndex, items.length]);
 
   if (items.length === 0) {
-    return <p className="py-16 text-center text-muted">Henüz fotoğraf yok.</p>;
+    return <p className="py-16 text-center text-muted">{t.collection.noPhotos}</p>;
   }
 
   const active = openIndex !== null ? items[openIndex] : null;
@@ -70,7 +72,7 @@ export default function PhotoGrid({
                 type="button"
                 onClick={() => setOpenIndex(i)}
                 className="absolute inset-0 h-full w-full cursor-zoom-in"
-                aria-label="Fotoğrafı büyüt"
+                aria-label={t.collection.zoomPhoto}
               >
                 {url && (
                   <Image
@@ -103,7 +105,7 @@ export default function PhotoGrid({
             type="button"
             onClick={() => setOpenIndex(null)}
             className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20"
-            aria-label="Kapat"
+            aria-label={t.collection.close}
           >
             ✕
           </button>
@@ -117,7 +119,7 @@ export default function PhotoGrid({
                   setOpenIndex((i) => (i === null ? i : (i - 1 + items.length) % items.length));
                 }}
                 className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20 sm:left-4"
-                aria-label="Önceki fotoğraf"
+                aria-label={t.collection.prevPhoto}
               >
                 ‹
               </button>
@@ -128,7 +130,7 @@ export default function PhotoGrid({
                   setOpenIndex((i) => (i === null ? i : (i + 1) % items.length));
                 }}
                 className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20 sm:right-4"
-                aria-label="Sonraki fotoğraf"
+                aria-label={t.collection.nextPhoto}
               >
                 ›
               </button>

@@ -2,9 +2,11 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { signUp } from "../actions";
 
 export default function SignupPage() {
+  const { t } = useLocale();
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | undefined, formData: FormData) => {
       return (await signUp(formData)) ?? {};
@@ -19,36 +21,36 @@ export default function SignupPage() {
           <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl text-xl text-accent-foreground">
             ✺
           </span>
-          <h1 className="text-xl font-bold">Collectra&apos;ya katıl</h1>
-          <p className="text-sm text-muted">Koleksiyonunu paylaşmaya başla</p>
+          <h1 className="text-xl font-bold">{t.auth.signupTitle}</h1>
+          <p className="text-sm text-muted">{t.auth.signupSubtitle}</p>
         </div>
         <form action={formAction} className="flex flex-col gap-3">
           <input
             name="username"
-            placeholder="kullanici_adi"
+            placeholder={t.auth.username}
             pattern="[a-z0-9_]{3,24}"
             required
             className="field"
           />
-          <input name="email" type="email" placeholder="E-posta" required className="field" />
+          <input name="email" type="email" placeholder={t.auth.email} required className="field" />
           <input
             name="password"
             type="password"
-            placeholder="Şifre (en az 6 karakter)"
+            placeholder={t.auth.passwordHint}
             minLength={6}
             required
             className="field"
           />
           {state?.error && <p className="text-sm text-danger">{state.error}</p>}
           <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
-            {pending ? "Kaydediliyor..." : "Kayıt ol"}
+            {pending ? t.auth.signupButtonPending : t.auth.signupButton}
           </button>
         </form>
       </div>
       <p className="mt-5 text-center text-sm text-muted">
-        Zaten hesabın var mı?{" "}
+        {t.auth.hasAccount}{" "}
         <Link href="/login" className="font-semibold text-accent hover:underline">
-          Giriş yap
+          {t.nav.login}
         </Link>
       </p>
     </div>
