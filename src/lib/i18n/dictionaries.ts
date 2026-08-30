@@ -30,6 +30,8 @@ export const dictionaries = {
       usernameInvalid: "Kullanıcı adı 3-24 karakter olmalı, sadece küçük harf/rakam/_ içerebilir.",
       passwordTooShort: "Şifre en az 6 karakter olmalı.",
       usernameTaken: "Bu kullanıcı adı zaten alınmış.",
+      showPassword: "Şifreyi göster",
+      hidePassword: "Şifreyi gizle",
     },
     newCollection: {
       pageTitle: "Yeni koleksiyon",
@@ -98,6 +100,9 @@ export const dictionaries = {
       follow: "Takip et",
       unfollow: "Takip ediliyor",
       empty: "Henüz koleksiyon paylaşılmamış.",
+      collectionsTab: "Koleksiyonlar",
+      likedTab: "Beğendiklerim",
+      emptyLiked: "Henüz bir koleksiyon beğenmedin.",
     },
     settings: {
       pageTitle: "Profili düzenle",
@@ -142,6 +147,8 @@ export const dictionaries = {
       usernameInvalid: "Username must be 3-24 characters: lowercase letters, digits, or _ only.",
       passwordTooShort: "Password must be at least 6 characters.",
       usernameTaken: "This username is already taken.",
+      showPassword: "Show password",
+      hidePassword: "Hide password",
     },
     newCollection: {
       pageTitle: "New collection",
@@ -210,6 +217,9 @@ export const dictionaries = {
       follow: "Follow",
       unfollow: "Following",
       empty: "No collections shared yet.",
+      collectionsTab: "Collections",
+      likedTab: "Liked",
+      emptyLiked: "You haven't liked any collections yet.",
     },
     settings: {
       pageTitle: "Edit profile",

@@ -5,6 +5,7 @@ import { publicImageUrl } from "@/lib/supabase/storage";
 import { getDict } from "@/lib/i18n";
 import SignOutButton from "./SignOutButton";
 import LanguageToggle from "./LanguageToggle";
+import StarMark from "./StarMark";
 
 export default async function Navbar() {
   const [profile, { t }] = await Promise.all([getCurrentProfile(), getDict()]);
@@ -14,8 +15,8 @@ export default async function Navbar() {
     <header className="sticky top-0 z-10 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-3 sm:px-4">
         <Link href="/" className="flex shrink-0 items-center gap-2 text-lg font-extrabold tracking-tight">
-          <span className="logo-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-accent-foreground">
-            ✺
+          <span className="logo-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
+            <StarMark className="h-[19px] w-[19px]" />
           </span>
           <span className="hidden sm:inline">Collectra</span>
         </Link>

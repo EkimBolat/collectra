@@ -1,12 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import PasswordField from "@/components/PasswordField";
+import StarMark from "@/components/StarMark";
 import { signUp } from "../actions";
 
 export default function SignupPage() {
   const { t } = useLocale();
+  const [username, setUsername] = useState("");
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | undefined, formData: FormData) => {
       return (await signUp(formData)) ?? {};
@@ -18,8 +21,8 @@ export default function SignupPage() {
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
       <div className="card p-7">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl text-xl text-accent-foreground">
-            ✺
+          <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl">
+            <StarMark className="h-6 w-6" />
           </span>
           <h1 className="text-xl font-bold">{t.auth.signupTitle}</h1>
           <p className="text-sm text-muted">{t.auth.signupSubtitle}</p>
@@ -27,20 +30,15 @@ export default function SignupPage() {
         <form action={formAction} className="flex flex-col gap-3">
           <input
             name="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
             placeholder={t.auth.username}
             pattern="[a-z0-9_]{3,24}"
             required
             className="field"
           />
           <input name="email" type="email" placeholder={t.auth.email} required className="field" />
-          <input
-            name="password"
-            type="password"
-            placeholder={t.auth.passwordHint}
-            minLength={6}
-            required
-            className="field"
-          />
+          <PasswordField name="password" placeholder={t.auth.passwordHint} minLength={6} required />
           {state?.error && <p className="text-sm text-danger">{state.error}</p>}
           <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
             {pending ? t.auth.signupButtonPending : t.auth.signupButton}

@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProfileByUsername, getProfileCollections, getFollowCounts } from "@/lib/data";
+import {
+  getProfileByUsername,
+  getProfileCollections,
+  getLikedCollections,
+  getFollowCounts,
+} from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -11,20 +16,27 @@ import Image from "next/image";
 
 export default async function ProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ username: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { username } = await params;
+  const { tab } = await searchParams;
   const profile = await getProfileByUsername(username);
   if (!profile) notFound();
 
   const [viewer, { t, locale }] = await Promise.all([getCurrentProfile(), getDict()]);
   const isOwnProfile = viewer?.id === profile.id;
+  const showLiked = isOwnProfile && tab === "likes";
 
-  const [collections, counts] = await Promise.all([
+  const [collections, liked, counts] = await Promise.all([
     getProfileCollections(profile.id),
+    isOwnProfile ? getLikedCollections(profile.id) : Promise.resolve([]),
     getFollowCounts(profile.id),
   ]);
+
+  const visibleCollections = showLiked ? liked : collections;
 
   let following = false;
   if (viewer && !isOwnProfile) {
@@ -81,14 +93,31 @@ export default async function ProfilePage({
         </div>
       </div>
 
-      {collections.length === 0 ? (
+      {isOwnProfile && (
+        <div className="mb-6 flex gap-2">
+          <Link
+            href={`/u/${profile.username}`}
+            className={!showLiked ? "chip chip-active" : "chip chip-idle"}
+          >
+            {t.profile.collectionsTab}
+          </Link>
+          <Link
+            href={`/u/${profile.username}?tab=likes`}
+            className={showLiked ? "chip chip-active" : "chip chip-idle"}
+          >
+            ♥ {t.profile.likedTab}
+          </Link>
+        </div>
+      )}
+
+      {visibleCollections.length === 0 ? (
         <div className="card flex flex-col items-center gap-2 px-4 py-20 text-center">
-          <span className="text-3xl">🗃️</span>
-          <p className="text-muted">{t.profile.empty}</p>
+          <span className="text-3xl">{showLiked ? "♡" : "🗃️"}</span>
+          <p className="text-muted">{showLiked ? t.profile.emptyLiked : t.profile.empty}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {collections.map((c) => (
+          {visibleCollections.map((c) => (
             <CollectionCard key={c.id} collection={c} locale={locale} />
           ))}
         </div>

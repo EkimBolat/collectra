@@ -75,6 +75,20 @@ export async function getProfileCollections(ownerId: string) {
   return (data ?? []) as unknown as CollectionWithRelations[];
 }
 
+export async function getLikedCollections(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("likes")
+    .select(`created_at, collection:collections(${COLLECTION_SELECT})`)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+  return ((data ?? []) as unknown as { collection: CollectionWithRelations | null }[])
+    .map((row) => row.collection)
+    .filter((c): c is CollectionWithRelations => c !== null);
+}
+
 export async function getFollowCounts(profileId: string) {
   const supabase = await createClient();
   const [followers, following] = await Promise.all([
