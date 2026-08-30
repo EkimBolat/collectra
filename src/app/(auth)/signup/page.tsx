@@ -23,7 +23,6 @@ export default function SignupPage() {
           <p className="text-sm text-muted">Koleksiyonunu paylaşmaya başla</p>
         </div>
         <form action={formAction} className="flex flex-col gap-3">
-          <input name="display_name" placeholder="Görünen ad" required className="field" />
           <input
             name="username"
             placeholder="kullanici_adi"

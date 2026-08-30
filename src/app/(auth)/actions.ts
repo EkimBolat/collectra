@@ -7,13 +7,9 @@ export async function signUp(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const username = String(formData.get("username") ?? "").trim().toLowerCase();
-  const displayName = String(formData.get("display_name") ?? "").trim();
 
   if (!/^[a-z0-9_]{3,24}$/.test(username)) {
     return { error: "Kullanıcı adı 3-24 karakter olmalı, sadece küçük harf/rakam/_ içerebilir." };
-  }
-  if (!displayName) {
-    return { error: "Görünen ad boş olamaz." };
   }
   if (password.length < 6) {
     return { error: "Şifre en az 6 karakter olmalı." };
@@ -23,7 +19,7 @@ export async function signUp(formData: FormData) {
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { username, display_name: displayName } },
+    options: { data: { username, display_name: username } },
   });
 
   if (error) {
