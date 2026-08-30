@@ -1,7 +1,17 @@
-# Collectra
+<p align="center">
+  <img src="src/app/icon.svg" alt="Collectra logo" width="72" height="72" />
+</p>
 
-Koleksiyonlarını paylaşabildiğin, herkese açık ya da sadece takipçilerine özel gösterebildiğin,
-kategori bazlı keşfedilebilir bir koleksiyon paylaşım platformu.
+<h1 align="center">Collectra</h1>
+
+<p align="center">
+  Koleksiyonlarını paylaş, herkese açık ya da sadece takipçilerine özel göster,
+  kategori bazlı keşfet — Instagram'ın mantığında, odağı koleksiyonlar olan bir platform.
+</p>
+
+<p align="center">
+  <a href="https://collectra-one.vercel.app/"><strong>Canlı demo →</strong></a>
+</p>
 
 ## Stack
 
@@ -10,35 +20,19 @@ kategori bazlı keşfedilebilir bir koleksiyon paylaşım platformu.
 
 ## Kurulum
 
-1. [supabase.com](https://supabase.com) üzerinde ücretsiz bir proje oluştur.
-2. Proje ayarlarından **Project URL** ve **anon public key** değerlerini al
-   (Settings → API).
-3. `.env.local.example` dosyasını `.env.local` olarak kopyala ve değerleri doldur:
-
-   ```bash
-   cp .env.local.example .env.local
-   ```
-
-4. Supabase panelinde **SQL Editor**'ü aç, [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql)
-   dosyasının tüm içeriğini yapıştırıp çalıştır. Bu, tabloları, RLS politikalarını,
-   storage bucket'larını ve kayıt olunca profil oluşturan trigger'ı kurar.
-5. (Önerilir, geliştirme kolaylığı için) Authentication → Providers → Email altında
-   **Confirm email**'i kapat, böylece kayıt olur olmaz giriş yapılabilir.
-6. Bağımlılıkları kur ve sunucuyu başlat:
-
-   ```bash
-   npm install
-   npm run dev
-   ```
-
-7. [http://localhost:3000](http://localhost:3000) adresini aç.
+1. [supabase.com](https://supabase.com) üzerinde ücretsiz bir proje oluştur, **Project URL** ve
+   **anon public key**'i al (Settings → API).
+2. `.env.local.example` dosyasını `.env.local` olarak kopyala ve değerleri doldur.
+3. Supabase **SQL Editor**'ünde [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql)
+   dosyasını çalıştır (tablolar, RLS, storage bucket'ları).
+4. Authentication → Providers → Email altında **Confirm email**'i kapat.
+5. `npm install && npm run dev` ile başlat.
 
 ## Veri modeli
 
 - **profiles** — kullanıcı adı, görünen ad, bio, avatar.
-- **collections** — bir koleksiyonun kendisi (başlık, kategori, görünürlük: `public` / `followers` / `private`).
-- **collection_items** — koleksiyona ait fotoğraflar; koleksiyon oluşturulduktan sonra da yeni parça eklenebilir.
+- **collections** — başlık, kategori, görünürlük (`public` / `followers` / `private`).
+- **collection_items** — koleksiyona ait fotoğraflar; sonradan da parça eklenebilir.
 - **follows**, **likes**, **comments** — sosyal etkileşim.
 
-Görünürlük kuralları veritabanı seviyesinde (RLS) uygulanır: `public` herkese,
-`followers` sadece takip edenlere, `private` sadece sahibine görünür.
+Görünürlük kuralları veritabanı seviyesinde (RLS) uygulanır.
