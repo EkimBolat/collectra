@@ -25,6 +25,15 @@ export default function PhotoGrid({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
+    for (const item of items) {
+      const url = publicImageUrl("collection-images", item.image_path);
+      if (!url) continue;
+      const img = new window.Image();
+      img.src = url;
+    }
+  }, [items]);
+
+  useEffect(() => {
     if (openIndex === null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpenIndex(null);
@@ -127,15 +136,15 @@ export default function PhotoGrid({
           )}
 
           <div
-            className="relative h-full max-h-[85vh] w-full max-w-3xl"
+            className="relative flex h-full max-h-[85vh] w-full max-w-3xl items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
+            {/* Plain img (not next/image) so switching photos is instant — it hits the
+                Supabase CDN directly instead of round-tripping through the image optimizer. */}
+            <img
               src={activeUrl}
               alt={active.caption ?? title}
-              fill
-              sizes="100vw"
-              className="object-contain"
+              className="max-h-full max-w-full object-contain"
             />
           </div>
 
