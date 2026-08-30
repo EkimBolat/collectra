@@ -13,6 +13,10 @@
   <a href="https://collectra-one.vercel.app/"><strong>Live demo →</strong></a>
 </p>
 
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
+</p>
+
 ## What it does
 
 - **Share any kind of collection** — Lego, trading cards, stamps, coins, vinyl, books,
@@ -29,3 +33,7 @@
 Next.js (App Router, TypeScript, Tailwind CSS) with Supabase for auth, Postgres, and
 image storage — visibility rules are enforced at the database level with Row Level
 Security.
+
+## License
+
+[MIT](LICENSE)
