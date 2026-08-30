@@ -16,7 +16,7 @@ export default function SignupPage() {
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
       <div className="card p-7">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-xl text-accent-foreground">
+          <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl text-xl text-accent-foreground">
             ✺
           </span>
           <h1 className="text-xl font-bold">Collectra&apos;ya katıl</h1>

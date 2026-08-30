@@ -6,9 +6,10 @@
   --foreground: #1c1917;
   --muted: #78716c;
   --border: #e7e5e4;
-  --accent: #b45309;
-  --accent-foreground: #fffbeb;
-  --accent-soft: #fef3c7;
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
+  --accent-soft: #eef2ff;
+  --accent-gradient: linear-gradient(135deg, #4f46e5, #a855f7);
   --danger: #dc2626;
 }
 
@@ -33,9 +34,10 @@
     --foreground: #f5f5f4;
     --muted: #a8a29e;
     --border: #292524;
-    --accent: #f59e0b;
-    --accent-foreground: #1c1917;
-    --accent-soft: #292018;
+    --accent: #818cf8;
+    --accent-foreground: #ffffff;
+    --accent-soft: #211f3d;
+    --accent-gradient: linear-gradient(135deg, #6366f1, #c084fc);
     --danger: #f87171;
   }
 }
@@ -81,5 +83,8 @@ body {
   }
   .chip-idle {
     @apply border-border bg-surface text-muted hover:text-foreground;
+  }
+  .logo-mark {
+    background: var(--accent-gradient);
   }
 }

@@ -12,7 +12,7 @@ export default async function Navbar() {
     <header className="sticky top-0 z-10 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-lg font-extrabold tracking-tight">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+          <span className="logo-mark flex h-8 w-8 items-center justify-center rounded-xl text-accent-foreground">
             ✺
           </span>
           Collectra
