@@ -8,7 +8,7 @@ import LikeButton from "@/components/LikeButton";
 import FollowButton from "@/components/FollowButton";
 import CommentsSection from "@/components/CommentsSection";
 import AddItemsForm from "./AddItemsForm";
-import DeleteItemButton from "./DeleteItemButton";
+import PhotoGrid from "./PhotoGrid";
 import OwnerMenu from "./OwnerMenu";
 import { createClient } from "@/lib/supabase/server";
 
@@ -111,38 +111,7 @@ export default async function CollectionDetailPage({
         </div>
       )}
 
-      {items.length === 0 ? (
-        <p className="py-16 text-center text-muted">Henüz fotoğraf yok.</p>
-      ) : (
-        <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {items.map((item) => {
-            const url = publicImageUrl("collection-images", item.image_path);
-            return (
-              <div
-                key={item.id}
-                className="group relative aspect-square overflow-hidden rounded-xl bg-accent-soft"
-              >
-                {url && (
-                  <Image
-                    src={url}
-                    alt={item.caption ?? collection.title}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                )}
-                {isOwner && (
-                  <DeleteItemButton
-                    collectionId={collection.id}
-                    itemId={item.id}
-                    imagePath={item.image_path}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <PhotoGrid collectionId={collection.id} items={items} isOwner={isOwner} title={collection.title} />
 
       <CommentsSection collectionId={collection.id} comments={comments} canComment={Boolean(profile)} />
     </div>
