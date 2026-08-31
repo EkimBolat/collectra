@@ -6,42 +6,35 @@ import {
   getLikedCollections,
   getFollowers,
   getFollowing,
-  getFollowCounts,
 } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { createClient } from "@/lib/supabase/server";
 import { getDict } from "@/lib/i18n";
-import CollectionCard from "@/components/CollectionCard";
 import FollowButton from "@/components/FollowButton";
-import FollowListModal from "@/components/FollowListModal";
+import ProfileTabs from "./ProfileTabs";
 import Image from "next/image";
 
 export default async function ProfilePage({
   params,
-  searchParams,
 }: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<{ tab?: string; panel?: string }>;
 }) {
   const { username } = await params;
-  const { tab, panel } = await searchParams;
   const profile = await getProfileByUsername(username);
   if (!profile) notFound();
 
-  const [viewer, { t, locale }] = await Promise.all([getCurrentProfile(), getDict()]);
+  const [viewer, { t }] = await Promise.all([getCurrentProfile(), getDict()]);
   const isOwnProfile = viewer?.id === profile.id;
-  const showLiked = isOwnProfile && tab === "likes";
 
-  const [collections, liked, counts] = await Promise.all([
+  const [collections, liked, followers, following] = await Promise.all([
     getProfileCollections(profile.id),
     isOwnProfile ? getLikedCollections(profile.id) : Promise.resolve([]),
-    getFollowCounts(profile.id),
+    getFollowers(profile.id),
+    getFollowing(profile.id),
   ]);
 
-  const visibleCollections = showLiked ? liked : collections;
-
-  let following = false;
+  let isFollowing = false;
   if (viewer && !isOwnProfile) {
     const supabase = await createClient();
     const { data } = await supabase
@@ -50,7 +43,7 @@ export default async function ProfilePage({
       .eq("follower_id", viewer.id)
       .eq("following_id", profile.id)
       .maybeSingle();
-    following = Boolean(data);
+    isFollowing = Boolean(data);
   }
 
   const avatarUrl = publicImageUrl("avatars", profile.avatar_path);
@@ -58,7 +51,7 @@ export default async function ProfilePage({
 
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
-      <div className="mb-8 flex items-center gap-6">
+      <div className="mb-2 flex items-center gap-6">
         <span className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-accent-soft ring-2 ring-border">
           {avatarUrl && (
             <Image src={avatarUrl} alt={profile.username} fill className="object-cover" />
@@ -76,73 +69,23 @@ export default async function ProfilePage({
                 <FollowButton
                   targetUserId={profile.id}
                   path={profileUrl}
-                  following={following}
+                  following={isFollowing}
                 />
               )
             )}
           </div>
           <p className="text-sm text-muted">@{profile.username}</p>
           {profile.bio && <p className="mt-2 text-sm">{profile.bio}</p>}
-          <div className="mt-3 flex gap-5 text-sm text-muted">
-            <span>
-              <strong className="text-foreground">{collections.length}</strong> {t.profile.collections}
-            </span>
-            <Link href={`${profileUrl}?panel=followers`} className="hover:text-foreground hover:underline">
-              <strong className="text-foreground">{counts.followers}</strong> {t.profile.followers}
-            </Link>
-            <Link href={`${profileUrl}?panel=following`} className="hover:text-foreground hover:underline">
-              <strong className="text-foreground">{counts.following}</strong> {t.profile.following}
-            </Link>
-          </div>
         </div>
       </div>
 
-      {isOwnProfile && (
-        <div className="mb-6 flex gap-2">
-          <Link
-            href={profileUrl}
-            className={!showLiked ? "chip chip-active" : "chip chip-idle"}
-          >
-            {t.profile.collectionsTab}
-          </Link>
-          <Link
-            href={`${profileUrl}?tab=likes`}
-            className={showLiked ? "chip chip-active" : "chip chip-idle"}
-          >
-            ♥ {t.profile.likedTab}
-          </Link>
-        </div>
-      )}
-
-      {visibleCollections.length === 0 ? (
-        <div className="card flex flex-col items-center gap-2 px-4 py-20 text-center">
-          <span className="text-3xl">{showLiked ? "♡" : "🗃️"}</span>
-          <p className="text-muted">{showLiked ? t.profile.emptyLiked : t.profile.empty}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {visibleCollections.map((c) => (
-            <CollectionCard key={c.id} collection={c} locale={locale} />
-          ))}
-        </div>
-      )}
-
-      {panel === "followers" && (
-        <FollowListModal
-          title={t.profile.followersTitle}
-          people={await getFollowers(profile.id)}
-          emptyText={t.profile.noFollowers}
-          closeHref={profileUrl}
-        />
-      )}
-      {panel === "following" && (
-        <FollowListModal
-          title={t.profile.followingTitle}
-          people={await getFollowing(profile.id)}
-          emptyText={t.profile.noFollowing}
-          closeHref={profileUrl}
-        />
-      )}
+      <ProfileTabs
+        collections={collections}
+        liked={liked}
+        showLikedTab={isOwnProfile}
+        followers={followers}
+        following={following}
+      />
     </div>
   );
 }

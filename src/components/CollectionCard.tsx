@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
-import { categoryName, type Locale } from "@/lib/i18n";
+import { categoryName, type Locale } from "@/lib/i18n/client";
 import type { CollectionWithRelations } from "@/lib/types";
 
 export default function CollectionCard({

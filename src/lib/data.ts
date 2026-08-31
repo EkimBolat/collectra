@@ -124,24 +124,6 @@ export async function getFollowing(profileId: string): Promise<FollowListProfile
     .filter(Boolean);
 }
 
-export async function getFollowCounts(profileId: string) {
-  const supabase = await createClient();
-  const [followers, following] = await Promise.all([
-    supabase
-      .from("follows")
-      .select("follower_id", { count: "exact", head: true })
-      .eq("following_id", profileId),
-    supabase
-      .from("follows")
-      .select("following_id", { count: "exact", head: true })
-      .eq("follower_id", profileId),
-  ]);
-  return {
-    followers: followers.count ?? 0,
-    following: following.count ?? 0,
-  };
-}
-
 export async function isFollowing(followerId: string, followingId: string) {
   const supabase = await createClient();
   const { data } = await supabase

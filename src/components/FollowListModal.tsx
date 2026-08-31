@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
@@ -9,26 +11,32 @@ export default function FollowListModal({
   title,
   people,
   emptyText,
-  closeHref,
+  onClose,
 }: {
   title: string;
   people: ListProfile[];
   emptyText: string;
-  closeHref: string;
+  onClose: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <Link href={closeHref} className="absolute inset-0 bg-black/60" aria-label="Close" />
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/60"
+        aria-label="Close"
+      />
       <div className="card relative flex max-h-[80vh] w-full max-w-sm flex-col overflow-hidden">
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <h2 className="font-semibold">{title}</h2>
-          <Link
-            href={closeHref}
+          <button
+            type="button"
+            onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:bg-black/[.03] hover:text-foreground dark:hover:bg-white/[.06]"
             aria-label="Close"
           >
             ✕
-          </Link>
+          </button>
         </div>
         <div className="overflow-y-auto">
           {people.length === 0 ? (
@@ -41,6 +49,7 @@ export default function FollowListModal({
                   <li key={p.id}>
                     <Link
                       href={`/u/${p.username}`}
+                      onClick={onClose}
                       className="flex items-center gap-3 px-5 py-3 hover:bg-black/[.03] dark:hover:bg-white/[.06]"
                     >
                       <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-accent-soft">
