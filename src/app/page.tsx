@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getCategories, getFeedCollections } from "@/lib/data";
-import { getDict, categoryName } from "@/lib/i18n";
+import { getDict } from "@/lib/i18n";
 import CollectionCard from "@/components/CollectionCard";
+import CategoryScroller from "@/components/CategoryScroller";
 
 export default async function ExplorePage({
   searchParams,
@@ -17,20 +17,12 @@ export default async function ExplorePage({
 
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
-      <div className="mb-6 flex flex-wrap gap-2">
-        <Link href="/" className={category ? "chip chip-idle" : "chip chip-active"}>
-          {t.home.all}
-        </Link>
-        {categories.map((c) => (
-          <Link
-            key={c.id}
-            href={`/?category=${c.slug}`}
-            className={category === c.slug ? "chip chip-active" : "chip chip-idle"}
-          >
-            {c.emoji} {categoryName(c.slug, locale, c.name)}
-          </Link>
-        ))}
-      </div>
+      <CategoryScroller
+        categories={categories}
+        activeSlug={category}
+        allLabel={t.home.all}
+        locale={locale}
+      />
 
       {collections.length === 0 ? (
         <div className="card flex flex-col items-center gap-2 px-4 py-20 text-center">

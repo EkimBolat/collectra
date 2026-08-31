@@ -58,6 +58,14 @@ body {
   color: var(--accent);
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 sm:px-4;
@@ -81,7 +89,7 @@ body {
     @apply rounded-2xl border border-border bg-surface;
   }
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors;
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors;
   }
   .chip-active {
     @apply border-accent bg-accent text-accent-foreground;
