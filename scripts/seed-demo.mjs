@@ -1,7 +1,8 @@
 // One-off script to seed demo collections with real, openly-licensed photos
 // from Wikimedia Commons so the explore feed feels alive. Run with:
 //   node scripts/seed-demo.mjs
-// Requires NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY (reads .env.local).
+// Requires NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY / SEED_DEMO_PASSWORD
+// (reads .env.local — this repo is public, so the password is never hardcoded here).
 
 import fs from "node:fs";
 import path from "node:path";
@@ -18,15 +19,21 @@ for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SEED_DEMO_PASSWORD = process.env.SEED_DEMO_PASSWORD;
+
+if (!SEED_DEMO_PASSWORD) {
+  console.error("Set SEED_DEMO_PASSWORD in .env.local first.");
+  process.exit(1);
+}
 
 const UA = "CollectraDemoSeed/1.0 (https://github.com/EkimBolat/collectra; ekim.bubu@gmail.com)";
 
 const USERS = {
-  kemalkoleksiyon: { display_name: "Kemal", password: "Demo12345!" },
-  nazlipostaci: { display_name: "Nazlı", password: "Demo12345!" },
-  ayseantika: { display_name: "Ayşe", password: "Demo12345!" },
-  cemvinyl: { display_name: "Cem", password: "Demo12345!" },
-  mustafapara: { display_name: "Mustafa", password: "Demo12345!" },
+  kemalkoleksiyon: { display_name: "Kemal", password: SEED_DEMO_PASSWORD },
+  nazlipostaci: { display_name: "Nazlı", password: SEED_DEMO_PASSWORD },
+  ayseantika: { display_name: "Ayşe", password: SEED_DEMO_PASSWORD },
+  cemvinyl: { display_name: "Cem", password: SEED_DEMO_PASSWORD },
+  mustafapara: { display_name: "Mustafa", password: SEED_DEMO_PASSWORD },
 };
 
 // category_id from supabase/migrations/0001_init.sql insertion order

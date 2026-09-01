@@ -13,6 +13,11 @@ for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SEED_DEMO_PASSWORD = process.env.SEED_DEMO_PASSWORD;
+if (!SEED_DEMO_PASSWORD) {
+  console.error("Set SEED_DEMO_PASSWORD in .env.local first.");
+  process.exit(1);
+}
 const UA = "CollectraDemoSeed/1.0 (https://github.com/EkimBolat/collectra; ekim.bubu@gmail.com)";
 
 const FIXES = [
@@ -79,7 +84,7 @@ async function main() {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: fix.email,
-      password: "Demo12345!",
+      password: SEED_DEMO_PASSWORD,
     });
     if (authError) throw authError;
     const user = authData.user;
