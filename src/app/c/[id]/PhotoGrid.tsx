@@ -104,7 +104,7 @@ export default function PhotoGrid({
           <button
             type="button"
             onClick={() => setOpenIndex(null)}
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20"
+            className="absolute right-4 top-[calc(1rem+env(safe-area-inset-top))] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20"
             aria-label={t.collection.close}
           >
             ✕
@@ -151,7 +151,7 @@ export default function PhotoGrid({
           </div>
 
           {items.length > 1 && (
-            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
+            <span className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
               {openIndex! + 1} / {items.length}
             </span>
           )}

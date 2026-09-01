@@ -24,7 +24,7 @@ export default function DeleteItemButton({
         }
       }}
       disabled={pending}
-      className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs text-white opacity-0 backdrop-blur-sm transition-opacity hover:bg-black/80 disabled:opacity-50 group-hover:opacity-100"
+      className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-xs text-white backdrop-blur-sm transition-colors hover:bg-black/80 disabled:opacity-50"
       aria-label={t.collection.removePhoto}
     >
       ✕
