@@ -56,7 +56,7 @@ export default function CommentItem({
           <span className="whitespace-pre-wrap">{comment.body}</span>
         </p>
         <div className="mt-0.5 flex items-center gap-3 text-xs text-muted">
-          <span>{timeAgo(comment.created_at, locale)}</span>
+          <span suppressHydrationWarning>{timeAgo(comment.created_at, locale)}</span>
           {isOwn && (
             <button
               type="button"
