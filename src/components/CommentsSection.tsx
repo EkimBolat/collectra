@@ -1,30 +1,24 @@
 "use client";
 
 import { useActionState, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { publicImageUrl } from "@/lib/supabase/storage";
-import { timeAgo } from "@/lib/i18n/client";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { addComment } from "@/app/c/[id]/actions";
-
-type Comment = {
-  id: string;
-  body: string;
-  created_at: string;
-  user: { id: string; username: string; display_name: string; avatar_path: string | null };
-};
+import type { CommentWithLikes } from "@/lib/data";
+import CommentItem from "./CommentItem";
 
 export default function CommentsSection({
   collectionId,
   comments,
   canComment,
+  viewerId,
 }: {
   collectionId: string;
-  comments: Comment[];
+  comments: CommentWithLikes[];
   canComment: boolean;
+  viewerId?: string;
 }) {
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
+  const path = `/c/${collectionId}`;
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string; success?: boolean } | undefined, formData: FormData) => {
@@ -45,27 +39,15 @@ export default function CommentsSection({
         <p className="text-sm text-muted">{t.collection.noComments}</p>
       ) : (
         <ul className="mb-4 flex flex-col gap-3.5">
-          {comments.map((c) => {
-            const avatarUrl = publicImageUrl("avatars", c.user.avatar_path);
-            return (
-              <li key={c.id} className="flex items-start gap-2.5">
-                <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-accent-soft">
-                  {avatarUrl && (
-                    <Image src={avatarUrl} alt={c.user.username} fill className="object-cover" />
-                  )}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm">
-                    <Link href={`/u/${c.user.username}`} className="font-semibold hover:underline">
-                      {c.user.username}
-                    </Link>{" "}
-                    <span className="whitespace-pre-wrap">{c.body}</span>
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted">{timeAgo(c.created_at, locale)}</p>
-                </div>
-              </li>
-            );
-          })}
+          {comments.map((c) => (
+            <CommentItem
+              key={c.id}
+              collectionId={collectionId}
+              comment={c}
+              path={path}
+              isOwn={viewerId === c.user.id}
+            />
+          ))}
         </ul>
       )}
 

@@ -51,7 +51,7 @@ export default async function CollectionDetailPage({
 
   const [items, comments] = await Promise.all([
     Promise.resolve([...collection.items].sort((a, b) => a.position - b.position)),
-    getComments(collection.id),
+    getComments(collection.id, profile?.id),
   ]);
   const path = `/c/${collection.id}`;
   const ownerAvatarUrl = publicImageUrl("avatars", collection.owner.avatar_path);
@@ -112,7 +112,12 @@ export default async function CollectionDetailPage({
 
       <PhotoGrid collectionId={collection.id} items={items} isOwner={isOwner} title={collection.title} />
 
-      <CommentsSection collectionId={collection.id} comments={comments} canComment={Boolean(profile)} />
+      <CommentsSection
+        collectionId={collection.id}
+        comments={comments}
+        canComment={Boolean(profile)}
+        viewerId={profile?.id}
+      />
     </div>
   );
 }

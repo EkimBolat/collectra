@@ -31,6 +31,33 @@ export async function toggleLike(collectionId: string, path: string) {
   revalidatePath(path);
 }
 
+export async function toggleCommentLike(commentId: string, path: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: existing } = await supabase
+    .from("comment_likes")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .eq("comment_id", commentId)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("comment_likes")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("comment_id", commentId);
+  } else {
+    await supabase.from("comment_likes").insert({ user_id: user.id, comment_id: commentId });
+  }
+
+  revalidatePath(path);
+}
+
 export async function toggleFollow(targetUserId: string, path: string) {
   const supabase = await createClient();
   const {

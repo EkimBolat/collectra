@@ -135,21 +135,52 @@ export async function isFollowing(followerId: string, followingId: string) {
   return Boolean(data);
 }
 
-export async function getComments(collectionId: string) {
+export type CommentWithLikes = {
+  id: string;
+  body: string;
+  created_at: string;
+  user: { id: string; username: string; display_name: string; avatar_path: string | null };
+  like_count: number;
+  liked_by_viewer: boolean;
+};
+
+export async function getComments(
+  collectionId: string,
+  viewerId?: string,
+): Promise<CommentWithLikes[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("comments")
-    .select("id, body, created_at, user:profiles(id, username, display_name, avatar_path)")
+    .select(
+      "id, body, created_at, user:profiles!comments_user_id_fkey(id, username, display_name, avatar_path), comment_likes(count)",
+    )
     .eq("collection_id", collectionId)
     .order("created_at", { ascending: true });
 
   if (error) return [];
-  return data as unknown as {
-    id: string;
-    body: string;
-    created_at: string;
-    user: { id: string; username: string; display_name: string; avatar_path: string | null };
-  }[];
+
+  const comments = data as unknown as (Omit<CommentWithLikes, "like_count" | "liked_by_viewer"> & {
+    comment_likes: { count: number }[];
+  })[];
+
+  let likedIds = new Set<string>();
+  if (viewerId && comments.length > 0) {
+    const { data: likedRows } = await supabase
+      .from("comment_likes")
+      .select("comment_id")
+      .eq("user_id", viewerId)
+      .in(
+        "comment_id",
+        comments.map((c) => c.id),
+      );
+    likedIds = new Set((likedRows ?? []).map((r) => r.comment_id));
+  }
+
+  return comments.map(({ comment_likes, ...c }) => ({
+    ...c,
+    like_count: comment_likes?.[0]?.count ?? 0,
+    liked_by_viewer: likedIds.has(c.id),
+  }));
 }
 
 export async function hasLiked(userId: string, collectionId: string) {

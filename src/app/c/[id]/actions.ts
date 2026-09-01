@@ -27,6 +27,18 @@ export async function addComment(collectionId: string, formData: FormData) {
   return { success: true };
 }
 
+export async function deleteComment(collectionId: string, commentId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase.from("comments").delete().eq("id", commentId).eq("user_id", user.id);
+
+  revalidatePath(`/c/${collectionId}`);
+}
+
 export async function updateCollection(collectionId: string, formData: FormData) {
   const supabase = await createClient();
   const { t } = await getDict();
