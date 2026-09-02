@@ -8,6 +8,7 @@ import { timeAgo } from "@/lib/i18n/client";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { toggleCommentLike } from "@/app/social-actions";
 import { deleteComment } from "@/app/c/[id]/actions";
+import ReportButton from "./ReportButton";
 import type { CommentWithLikes } from "@/lib/data";
 
 export default function CommentItem({
@@ -15,11 +16,13 @@ export default function CommentItem({
   comment,
   path,
   isOwn,
+  canReport,
 }: {
   collectionId: string;
   comment: CommentWithLikes;
   path: string;
   isOwn: boolean;
+  canReport: boolean;
 }) {
   const { t, locale } = useLocale();
   const [, startLikeTransition] = useTransition();
@@ -67,6 +70,7 @@ export default function CommentItem({
               {t.collection.delete}
             </button>
           )}
+          {canReport && <ReportButton targetType="comment" targetId={comment.id} variant="text" />}
         </div>
       </div>
       <button

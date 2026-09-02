@@ -1,5 +1,8 @@
 export type CollectionVisibility = "public" | "followers" | "private";
 
+export type ReportTargetType = "collection" | "comment";
+export type ReportReason = "inappropriate" | "off_topic" | "harassment" | "other";
+
 export type Category = {
   id: number;
   slug: string;

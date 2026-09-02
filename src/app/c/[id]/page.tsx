@@ -7,6 +7,7 @@ import { publicImageUrl } from "@/lib/supabase/storage";
 import { getDict, categoryName, collectionTimeLabel } from "@/lib/i18n";
 import LikeButton from "@/components/LikeButton";
 import FollowButton from "@/components/FollowButton";
+import ReportButton from "@/components/ReportButton";
 import CommentsSection from "@/components/CommentsSection";
 import AddItemsForm from "./AddItemsForm";
 import PhotoGrid from "./PhotoGrid";
@@ -99,6 +100,7 @@ export default async function CollectionDetailPage({
           {profile && !isOwner && (
             <FollowButton targetUserId={collection.owner_id} path={path} following={following} />
           )}
+          {profile && !isOwner && <ReportButton targetType="collection" targetId={collection.id} />}
           {isOwner && <OwnerMenu collectionId={collection.id} />}
         </div>
       </div>

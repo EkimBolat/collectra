@@ -46,6 +46,7 @@ export default function CommentsSection({
               comment={c}
               path={path}
               isOwn={viewerId === c.user.id}
+              canReport={Boolean(viewerId) && viewerId !== c.user.id}
             />
           ))}
         </ul>
