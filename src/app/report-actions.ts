@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getDict } from "@/lib/i18n";
 import type { ReportReason, ReportTargetType } from "@/lib/types";
@@ -10,6 +11,7 @@ export async function submitReport(
   targetId: string,
   reason: ReportReason,
   details: string,
+  path?: string,
 ) {
   const supabase = await createClient();
   const { t } = await getDict();
@@ -31,5 +33,17 @@ export async function submitReport(
     return { error: t.report.error };
   }
 
-  return { success: true };
+  let autoRemoved = false;
+  if (targetType === "comment") {
+    const { data: stillExists } = await supabase
+      .from("comments")
+      .select("id")
+      .eq("id", targetId)
+      .maybeSingle();
+    autoRemoved = !stillExists;
+  }
+
+  if (path) revalidatePath(path);
+
+  return { success: true, autoRemoved };
 }

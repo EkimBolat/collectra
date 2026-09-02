@@ -11,10 +11,12 @@ export default function ReportButton({
   targetType,
   targetId,
   variant = "icon",
+  path,
 }: {
   targetType: ReportTargetType;
   targetId: string;
   variant?: "icon" | "text";
+  path?: string;
 }) {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
@@ -25,6 +27,7 @@ export default function ReportButton({
     error?: string;
     success?: boolean;
     alreadyReported?: boolean;
+    autoRemoved?: boolean;
   } | null>(null);
 
   const reasonLabels: Record<ReportReason, string> = {
@@ -43,7 +46,7 @@ export default function ReportButton({
 
   const handleSubmit = () => {
     startTransition(async () => {
-      const res = await submitReport(targetType, targetId, reason, details);
+      const res = await submitReport(targetType, targetId, reason, details, path);
       setResult(res);
     });
   };
@@ -84,7 +87,11 @@ export default function ReportButton({
             {result?.success ? (
               <div>
                 <p className="text-sm text-foreground/90">
-                  {result.alreadyReported ? t.report.alreadyReported : t.report.success}
+                  {result.alreadyReported
+                    ? t.report.alreadyReported
+                    : result.autoRemoved
+                      ? t.report.autoRemoved
+                      : t.report.success}
                 </p>
                 <button type="button" onClick={close} className="btn btn-secondary mt-4 w-full">
                   {t.collection.close}

@@ -70,7 +70,9 @@ export default function CommentItem({
               {t.collection.delete}
             </button>
           )}
-          {canReport && <ReportButton targetType="comment" targetId={comment.id} variant="text" />}
+          {canReport && (
+            <ReportButton targetType="comment" targetId={comment.id} variant="text" path={path} />
+          )}
         </div>
       </div>
       <button
