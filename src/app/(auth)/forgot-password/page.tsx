@@ -4,7 +4,6 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import PasswordField from "@/components/PasswordField";
-import StarMark from "@/components/StarMark";
 import { requestPasswordReset, confirmPasswordReset } from "../actions";
 
 export default function ForgotPasswordPage() {
@@ -32,12 +31,9 @@ export default function ForgotPasswordPage() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
+    <>
       <div className="card p-7">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl">
-            <StarMark className="h-6 w-6" />
-          </span>
           <h1 className="text-xl font-bold">
             {codeSent ? t.forgotPassword.codeSentTitle : t.forgotPassword.requestTitle}
           </h1>
@@ -90,11 +86,11 @@ export default function ForgotPasswordPage() {
           </form>
         )}
       </div>
-      <p className="mt-5 text-center text-sm text-muted">
+      <p className="text-center text-sm text-muted">
         <Link href="/login" className="font-semibold text-accent hover:underline">
           {t.forgotPassword.backToLogin}
         </Link>
       </p>
-    </div>
+    </>
   );
 }

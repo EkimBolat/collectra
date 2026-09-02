@@ -4,7 +4,6 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import PasswordField from "@/components/PasswordField";
-import StarMark from "@/components/StarMark";
 import { signUp } from "../actions";
 
 export default function SignupPage() {
@@ -18,12 +17,9 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-16">
+    <>
       <div className="card p-7">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="logo-mark flex h-11 w-11 items-center justify-center rounded-2xl">
-            <StarMark className="h-6 w-6" />
-          </span>
           <h1 className="text-xl font-bold">{t.auth.signupTitle}</h1>
           <p className="text-sm text-muted">{t.auth.signupSubtitle}</p>
         </div>
@@ -45,12 +41,12 @@ export default function SignupPage() {
           </button>
         </form>
       </div>
-      <p className="mt-5 text-center text-sm text-muted">
+      <p className="text-center text-sm text-muted">
         {t.auth.hasAccount}{" "}
         <Link href="/login" className="font-semibold text-accent hover:underline">
           {t.nav.login}
         </Link>
       </p>
-    </div>
+    </>
   );
 }
