@@ -29,8 +29,9 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
       try {
         const path = await uploadAvatar(profile.id, avatarFile);
         if (path) formData.set("avatar_path", path);
-      } catch {
-        setError(t.settings.errorGeneric);
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        setError(`${t.settings.errorGeneric} (${detail})`);
         setPending(false);
         return;
       }

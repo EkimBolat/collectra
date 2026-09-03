@@ -47,8 +47,9 @@ export default function NewCollectionForm({
 
       await uploadCollectionImages(userId, result.id, files);
       router.push(`/c/${result.id}`);
-    } catch {
-      setError(t.newCollection.errorGeneric);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      setError(`${t.newCollection.errorGeneric} (${detail})`);
       setPending(false);
     }
   };

@@ -38,8 +38,9 @@ export default function AddItemsForm({
       await uploadCollectionImages(userId, collectionId, files, startPosition);
       formRef.current?.reset();
       router.refresh();
-    } catch {
-      setError(t.collection.errorUploadFailed);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      setError(`${t.collection.errorUploadFailed} (${detail})`);
     } finally {
       setPending(false);
     }
