@@ -3,11 +3,13 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { deleteCollection } from "./actions";
 
 export default function OwnerMenu({ collectionId }: { collectionId: string }) {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   return (
@@ -30,15 +32,27 @@ export default function OwnerMenu({ collectionId }: { collectionId: string }) {
           <button
             disabled={pending}
             onClick={() => {
-              if (confirm(t.collection.deleteConfirm)) {
-                startTransition(() => deleteCollection(collectionId));
-              }
+              setOpen(false);
+              setConfirmOpen(true);
             }}
             className="block w-full px-4 py-2.5 text-left text-sm text-danger hover:bg-danger/10 disabled:opacity-50"
           >
             {pending ? t.collection.deletePending : t.collection.delete}
           </button>
         </div>
+      )}
+      {confirmOpen && (
+        <ConfirmDialog
+          message={t.collection.deleteConfirm}
+          confirmLabel={t.collection.delete}
+          cancelLabel={t.collection.cancel}
+          pending={pending}
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={() => {
+            setConfirmOpen(false);
+            startTransition(() => deleteCollection(collectionId));
+          }}
+        />
       )}
     </div>
   );
