@@ -37,15 +37,20 @@ export default function NewCollectionForm({
     setError(null);
     setPending(true);
 
-    const result = await createCollection(formData);
-    if (result.error || !result.id) {
-      setError(result.error ?? t.newCollection.errorGeneric);
-      setPending(false);
-      return;
-    }
+    try {
+      const result = await createCollection(formData);
+      if (result.error || !result.id) {
+        setError(result.error ?? t.newCollection.errorGeneric);
+        setPending(false);
+        return;
+      }
 
-    await uploadCollectionImages(userId, result.id, files);
-    router.push(`/c/${result.id}`);
+      await uploadCollectionImages(userId, result.id, files);
+      router.push(`/c/${result.id}`);
+    } catch {
+      setError(t.newCollection.errorGeneric);
+      setPending(false);
+    }
   };
 
   return (

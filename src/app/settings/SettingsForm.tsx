@@ -26,8 +26,14 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
     formData.delete("avatar");
 
     if (avatarFile) {
-      const path = await uploadAvatar(profile.id, avatarFile);
-      if (path) formData.set("avatar_path", path);
+      try {
+        const path = await uploadAvatar(profile.id, avatarFile);
+        if (path) formData.set("avatar_path", path);
+      } catch {
+        setError(t.settings.errorGeneric);
+        setPending(false);
+        return;
+      }
     }
 
     const result = (await updateProfile(formData)) ?? {};

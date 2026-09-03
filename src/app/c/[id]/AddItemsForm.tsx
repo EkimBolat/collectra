@@ -34,10 +34,15 @@ export default function AddItemsForm({
 
     setError(null);
     setPending(true);
-    await uploadCollectionImages(userId, collectionId, files, startPosition);
-    setPending(false);
-    formRef.current?.reset();
-    router.refresh();
+    try {
+      await uploadCollectionImages(userId, collectionId, files, startPosition);
+      formRef.current?.reset();
+      router.refresh();
+    } catch {
+      setError(t.collection.errorUploadFailed);
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
