@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-import Image from "next/image";
 import { useState } from "react";
+import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { uploadAvatar } from "@/lib/supabase/upload";
 import type { Profile } from "@/lib/types";
 import { updateProfile } from "./actions";
 
@@ -13,15 +13,32 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
   const [preview, setPreview] = useState<string | null>(
     publicImageUrl("avatars", profile.avatar_path),
   );
-  const [state, formAction, pending] = useActionState(
-    async (_prev: { error?: string } | undefined, formData: FormData) => {
-      return (await updateProfile(formData)) ?? {};
-    },
-    undefined,
-  );
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+
+    const formData = new FormData(e.currentTarget);
+    formData.delete("avatar");
+
+    if (avatarFile) {
+      const path = await uploadAvatar(profile.id, avatarFile);
+      if (path) formData.set("avatar_path", path);
+    }
+
+    const result = (await updateProfile(formData)) ?? {};
+    if (result.error) {
+      setError(result.error);
+      setPending(false);
+    }
+  };
 
   return (
-    <form action={formAction} className="card flex flex-col gap-4 p-6">
+    <form onSubmit={handleSubmit} className="card flex flex-col gap-4 p-6">
       <div className="flex items-center gap-4">
         <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-accent-soft">
           {preview && <Image src={preview} alt="Avatar" fill className="object-cover" />}
@@ -35,7 +52,10 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) setPreview(URL.createObjectURL(file));
+              if (file) {
+                setAvatarFile(file);
+                setPreview(URL.createObjectURL(file));
+              }
             }}
           />
         </label>
@@ -63,7 +83,7 @@ export default function SettingsForm({ profile }: { profile: Profile }) {
         />
       </div>
 
-      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
         {pending ? t.settings.savePending : t.settings.save}

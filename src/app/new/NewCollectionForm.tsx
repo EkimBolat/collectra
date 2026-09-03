@@ -1,28 +1,55 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Category } from "@/lib/types";
 import { categoryName, type Locale } from "@/lib/i18n/client";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { uploadCollectionImages } from "@/lib/supabase/upload";
 import { createCollection } from "./actions";
 
 export default function NewCollectionForm({
   categories,
   locale,
+  userId,
 }: {
   categories: Category[];
   locale: Locale;
+  userId: string;
 }) {
   const { t } = useLocale();
-  const [state, formAction, pending] = useActionState(
-    async (_prev: { error?: string } | undefined, formData: FormData) => {
-      return (await createCollection(formData)) ?? {};
-    },
-    undefined,
-  );
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const files = formData
+      .getAll("images")
+      .filter((f): f is File => f instanceof File && f.size > 0);
+
+    if (files.length === 0) {
+      setError(t.newCollection.errorNoPhotos);
+      return;
+    }
+
+    setError(null);
+    setPending(true);
+
+    const result = await createCollection(formData);
+    if (result.error || !result.id) {
+      setError(result.error ?? t.newCollection.errorGeneric);
+      setPending(false);
+      return;
+    }
+
+    await uploadCollectionImages(userId, result.id, files);
+    router.push(`/c/${result.id}`);
+  };
 
   return (
-    <form action={formAction} className="card flex flex-col gap-4 p-6">
+    <form onSubmit={handleSubmit} className="card flex flex-col gap-4 p-6">
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">{t.newCollection.titleLabel}</label>
         <input
@@ -79,7 +106,7 @@ export default function NewCollectionForm({
         <p className="text-xs text-muted">{t.newCollection.photosHint}</p>
       </div>
 
-      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
         {pending ? t.newCollection.submitPending : t.newCollection.submit}

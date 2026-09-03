@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -16,7 +15,7 @@ export async function updateProfile(formData: FormData) {
 
   const displayName = String(formData.get("display_name") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
-  const avatarFile = formData.get("avatar");
+  const avatarPath = formData.get("avatar_path");
 
   if (!displayName) return { error: t.settings.errorDisplayNameRequired };
 
@@ -25,14 +24,8 @@ export async function updateProfile(formData: FormData) {
     bio: bio || null,
   };
 
-  if (avatarFile instanceof File && avatarFile.size > 0) {
-    const ext = avatarFile.name.split(".").pop() ?? "jpg";
-    const path = `${user.id}/${randomUUID()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(path, avatarFile, { contentType: avatarFile.type, upsert: false });
-
-    if (!uploadError) update.avatar_path = path;
+  if (typeof avatarPath === "string" && avatarPath) {
+    update.avatar_path = avatarPath;
   }
 
   const { data: profile } = await supabase

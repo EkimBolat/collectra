@@ -108,7 +108,11 @@ export default async function CollectionDetailPage({
       {isOwner && (
         <div className="card mb-6 border-dashed p-4">
           <p className="mb-2 text-sm font-medium">{t.collection.expandTitle}</p>
-          <AddItemsForm collectionId={collection.id} />
+          <AddItemsForm
+            collectionId={collection.id}
+            userId={collection.owner_id}
+            startPosition={collection.item_count}
+          />
         </div>
       )}
 

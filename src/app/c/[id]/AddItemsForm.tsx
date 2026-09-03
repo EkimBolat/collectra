@@ -1,23 +1,47 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
-import { addItems } from "@/app/new/actions";
+import { uploadCollectionImages } from "@/lib/supabase/upload";
 
-export default function AddItemsForm({ collectionId }: { collectionId: string }) {
+export default function AddItemsForm({
+  collectionId,
+  userId,
+  startPosition,
+}: {
+  collectionId: string;
+  userId: string;
+  startPosition: number;
+}) {
   const { t } = useLocale();
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const [state, formAction, pending] = useActionState(
-    async (_prev: { error?: string; success?: boolean } | undefined, formData: FormData) => {
-      const result = (await addItems(collectionId, formData)) ?? {};
-      if (result.success) formRef.current?.reset();
-      return result;
-    },
-    undefined,
-  );
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const files = formData
+      .getAll("images")
+      .filter((f): f is File => f instanceof File && f.size > 0);
+
+    if (files.length === 0) {
+      setError(t.collection.errorNoPhotos);
+      return;
+    }
+
+    setError(null);
+    setPending(true);
+    await uploadCollectionImages(userId, collectionId, files, startPosition);
+    setPending(false);
+    formRef.current?.reset();
+    router.refresh();
+  };
 
   return (
-    <form ref={formRef} action={formAction} className="flex flex-wrap items-center gap-3">
+    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-wrap items-center gap-3">
       <input
         name="images"
         type="file"
@@ -29,7 +53,7 @@ export default function AddItemsForm({ collectionId }: { collectionId: string })
       <button type="submit" disabled={pending} className="btn btn-primary">
         {pending ? t.collection.expandPending : t.collection.expandButton}
       </button>
-      {state?.error && <p className="w-full text-sm text-danger">{state.error}</p>}
+      {error && <p className="w-full text-sm text-danger">{error}</p>}
     </form>
   );
 }
