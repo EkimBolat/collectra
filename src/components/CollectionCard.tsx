@@ -11,7 +11,10 @@ export default function CollectionCard({
   collection: CollectionWithRelations;
   locale: Locale;
 }) {
-  const cover = [...collection.items].sort((a, b) => a.position - b.position)[0];
+  const sortedItems = [...collection.items].sort((a, b) => a.position - b.position);
+  const cover =
+    (collection.cover_item_id && sortedItems.find((i) => i.id === collection.cover_item_id)) ||
+    sortedItems[0];
   const coverUrl = publicImageUrl("collection-images", cover?.image_path ?? null);
 
   return (

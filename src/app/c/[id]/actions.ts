@@ -97,6 +97,23 @@ export async function deleteCollection(collectionId: string) {
   redirect("/");
 }
 
+export async function setCoverItem(collectionId: string, itemId: string | null) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase
+    .from("collections")
+    .update({ cover_item_id: itemId })
+    .eq("id", collectionId)
+    .eq("owner_id", user.id);
+
+  revalidatePath(`/c/${collectionId}`);
+  revalidatePath("/");
+}
+
 export async function deleteItem(collectionId: string, itemId: string, imagePath: string) {
   const supabase = await createClient();
   const {

@@ -116,7 +116,13 @@ export default async function CollectionDetailPage({
         </div>
       )}
 
-      <PhotoGrid collectionId={collection.id} items={items} isOwner={isOwner} title={collection.title} />
+      <PhotoGrid
+        collectionId={collection.id}
+        items={items}
+        isOwner={isOwner}
+        title={collection.title}
+        coverItemId={collection.cover_item_id}
+      />
 
       <CommentsSection
         collectionId={collection.id}

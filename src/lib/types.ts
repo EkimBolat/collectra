@@ -27,6 +27,7 @@ export type Collection = {
   description: string | null;
   category_id: number;
   visibility: CollectionVisibility;
+  cover_item_id: string | null;
   item_count: number;
   like_count: number;
   created_at: string;

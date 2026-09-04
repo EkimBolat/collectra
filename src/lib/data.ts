@@ -5,7 +5,7 @@ const COLLECTION_SELECT = `
   *,
   owner:profiles!collections_owner_id_fkey(id, username, display_name, avatar_path),
   category:categories(slug, name, emoji),
-  items:collection_items(id, image_path, caption, position, created_at, collection_id)
+  items:collection_items!collection_items_collection_id_fkey(id, image_path, caption, position, created_at, collection_id)
 `;
 
 export async function getCategories(): Promise<Category[]> {

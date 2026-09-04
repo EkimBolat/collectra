@@ -5,6 +5,7 @@ import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import DeleteItemButton from "./DeleteItemButton";
+import CoverButton from "./CoverButton";
 
 type Item = {
   id: string;
@@ -17,14 +18,17 @@ export default function PhotoGrid({
   items,
   isOwner,
   title,
+  coverItemId,
 }: {
   collectionId: string;
   items: Item[];
   isOwner: boolean;
   title: string;
+  coverItemId: string | null;
 }) {
   const { t } = useLocale();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const effectiveCoverId = coverItemId ?? items[0]?.id ?? null;
 
   useEffect(() => {
     for (const item of items) {
@@ -85,11 +89,18 @@ export default function PhotoGrid({
                 )}
               </button>
               {isOwner && (
-                <DeleteItemButton
-                  collectionId={collectionId}
-                  itemId={item.id}
-                  imagePath={item.image_path}
-                />
+                <>
+                  <CoverButton
+                    collectionId={collectionId}
+                    itemId={item.id}
+                    isCover={item.id === effectiveCoverId}
+                  />
+                  <DeleteItemButton
+                    collectionId={collectionId}
+                    itemId={item.id}
+                    imagePath={item.image_path}
+                  />
+                </>
               )}
             </div>
           );
