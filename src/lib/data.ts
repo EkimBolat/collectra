@@ -124,6 +124,35 @@ export async function getFollowing(profileId: string): Promise<FollowListProfile
     .filter(Boolean);
 }
 
+export async function getCollaborators(collectionId: string): Promise<FollowListProfile[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("collection_collaborators")
+    .select("user:profiles!collection_collaborators_user_id_fkey(id, username, display_name, avatar_path)")
+    .eq("collection_id", collectionId);
+
+  if (error) return [];
+  return (data as unknown as { user: FollowListProfile }[])
+    .map((row) => row.user)
+    .filter(Boolean);
+}
+
+export async function getCollaborationCandidates(
+  ownerId: string,
+  excludeIds: string[],
+): Promise<FollowListProfile[]> {
+  const [followers, following] = await Promise.all([
+    getFollowers(ownerId),
+    getFollowing(ownerId),
+  ]);
+  const exclude = new Set([ownerId, ...excludeIds]);
+  const byId = new Map<string, FollowListProfile>();
+  for (const p of [...followers, ...following]) {
+    if (!exclude.has(p.id)) byId.set(p.id, p);
+  }
+  return Array.from(byId.values());
+}
+
 export async function isFollowing(followerId: string, followingId: string) {
   const supabase = await createClient();
   const { data } = await supabase

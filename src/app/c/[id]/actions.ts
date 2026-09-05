@@ -97,6 +97,34 @@ export async function deleteCollection(collectionId: string) {
   redirect("/");
 }
 
+export async function addCollaborator(collectionId: string, userId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase.from("collection_collaborators").insert({ collection_id: collectionId, user_id: userId });
+
+  revalidatePath(`/c/${collectionId}`);
+}
+
+export async function removeCollaborator(collectionId: string, userId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase
+    .from("collection_collaborators")
+    .delete()
+    .eq("collection_id", collectionId)
+    .eq("user_id", userId);
+
+  revalidatePath(`/c/${collectionId}`);
+}
+
 export async function setCoverItem(collectionId: string, itemId: string | null) {
   const supabase = await createClient();
   const {

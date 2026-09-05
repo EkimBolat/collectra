@@ -17,12 +17,14 @@ export default function PhotoGrid({
   collectionId,
   items,
   isOwner,
+  canEdit,
   title,
   coverItemId,
 }: {
   collectionId: string;
   items: Item[];
   isOwner: boolean;
+  canEdit: boolean;
   title: string;
   coverItemId: string | null;
 }) {
@@ -89,18 +91,18 @@ export default function PhotoGrid({
                 )}
               </button>
               {isOwner && (
-                <>
-                  <CoverButton
-                    collectionId={collectionId}
-                    itemId={item.id}
-                    isCover={item.id === effectiveCoverId}
-                  />
-                  <DeleteItemButton
-                    collectionId={collectionId}
-                    itemId={item.id}
-                    imagePath={item.image_path}
-                  />
-                </>
+                <CoverButton
+                  collectionId={collectionId}
+                  itemId={item.id}
+                  isCover={item.id === effectiveCoverId}
+                />
+              )}
+              {canEdit && (
+                <DeleteItemButton
+                  collectionId={collectionId}
+                  itemId={item.id}
+                  imagePath={item.image_path}
+                />
               )}
             </div>
           );

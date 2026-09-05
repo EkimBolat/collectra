@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCollectionById, getComments } from "@/lib/data";
+import { getCollectionById, getComments, getCollaborators, getCollaborationCandidates } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { getDict, categoryName, collectionTimeLabel } from "@/lib/i18n";
@@ -23,8 +23,20 @@ export default async function CollectionDetailPage({
   const collection = await getCollectionById(id);
   if (!collection) notFound();
 
-  const [profile, { t, locale }] = await Promise.all([getCurrentProfile(), getDict()]);
+  const [profile, { t, locale }, collaborators] = await Promise.all([
+    getCurrentProfile(),
+    getDict(),
+    getCollaborators(collection.id),
+  ]);
   const isOwner = profile?.id === collection.owner_id;
+  const isCollaborator = Boolean(profile && collaborators.some((c) => c.id === profile.id));
+  const canEdit = isOwner || isCollaborator;
+  const candidates = isOwner
+    ? await getCollaborationCandidates(
+        collection.owner_id,
+        collaborators.map((c) => c.id),
+      )
+    : [];
 
   let liked = false;
   let following = false;
@@ -81,6 +93,12 @@ export default async function CollectionDetailPage({
             <span>{visibilityLabel}</span>
             <span>·</span>
             <span>{t.collection.itemsCount(collection.item_count)}</span>
+            {collaborators.length > 0 && (
+              <>
+                <span>·</span>
+                <span>{t.collection.collaboratorsCount(collaborators.length)}</span>
+              </>
+            )}
             <span>·</span>
             <span>{timeLabel}</span>
           </div>
@@ -101,16 +119,18 @@ export default async function CollectionDetailPage({
             <FollowButton targetUserId={collection.owner_id} path={path} following={following} />
           )}
           {profile && !isOwner && <ReportButton targetType="collection" targetId={collection.id} />}
-          {isOwner && <OwnerMenu collectionId={collection.id} />}
+          {isOwner && (
+            <OwnerMenu collectionId={collection.id} collaborators={collaborators} candidates={candidates} />
+          )}
         </div>
       </div>
 
-      {isOwner && (
+      {canEdit && profile && (
         <div className="card mb-6 border-dashed p-4">
           <p className="mb-2 text-sm font-medium">{t.collection.expandTitle}</p>
           <AddItemsForm
             collectionId={collection.id}
-            userId={collection.owner_id}
+            userId={profile.id}
             startPosition={collection.item_count}
           />
         </div>
@@ -120,6 +140,7 @@ export default async function CollectionDetailPage({
         collectionId={collection.id}
         items={items}
         isOwner={isOwner}
+        canEdit={canEdit}
         title={collection.title}
         coverItemId={collection.cover_item_id}
       />
