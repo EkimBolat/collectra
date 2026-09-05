@@ -131,6 +131,8 @@ export const dictionaries = {
     collaborators: {
       manage: "Ortak çalışanlar",
       title: "Ortak çalışanlar",
+      optionalLabel: "Ortak çalışanlar (opsiyonel)",
+      optionalHint: "Takip ettiğin veya seni takip eden birini seçip koleksiyona fotoğraf ekleme/silme yetkisi verebilirsin.",
       current: "Şu an ekli olanlar",
       add: "Ekle",
       addAction: "Ekle",
@@ -309,6 +311,8 @@ export const dictionaries = {
     collaborators: {
       manage: "Collaborators",
       title: "Collaborators",
+      optionalLabel: "Collaborators (optional)",
+      optionalHint: "Pick someone you follow or who follows you to let them add and remove photos in this collection.",
       current: "Currently added",
       add: "Add",
       addAction: "Add",

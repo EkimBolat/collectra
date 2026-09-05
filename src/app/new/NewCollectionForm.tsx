@@ -2,25 +2,42 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Category } from "@/lib/types";
+import Image from "next/image";
+import { publicImageUrl } from "@/lib/supabase/storage";
+import type { Category, Profile } from "@/lib/types";
 import { categoryName, type Locale } from "@/lib/i18n/client";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { uploadCollectionImages } from "@/lib/supabase/upload";
+import { addCollaborator } from "@/app/c/[id]/actions";
 import { createCollection } from "./actions";
+
+type ListProfile = Pick<Profile, "id" | "username" | "display_name" | "avatar_path">;
 
 export default function NewCollectionForm({
   categories,
   locale,
   userId,
+  candidates,
 }: {
   categories: Category[];
   locale: Locale;
   userId: string;
+  candidates: ListProfile[];
 }) {
   const { t } = useLocale();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const toggleCollaborator = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,6 +63,11 @@ export default function NewCollectionForm({
       }
 
       await uploadCollectionImages(userId, result.id, files);
+      if (selected.size > 0) {
+        await Promise.all(
+          Array.from(selected).map((collaboratorId) => addCollaborator(result.id, collaboratorId)),
+        );
+      }
       router.push(`/c/${result.id}`);
     } catch (err) {
       const detail = err instanceof Error ? err.message : String(err);
@@ -111,6 +133,40 @@ export default function NewCollectionForm({
         />
         <p className="text-xs text-muted">{t.newCollection.photosHint}</p>
       </div>
+
+      {candidates.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium">{t.collaborators.optionalLabel}</label>
+          <p className="text-xs text-muted">{t.collaborators.optionalHint}</p>
+          <ul className="mt-1 flex flex-col gap-1 rounded-xl border border-border p-1.5">
+            {candidates.map((p) => {
+              const avatarUrl = publicImageUrl("avatars", p.avatar_path);
+              const checked = selected.has(p.id);
+              return (
+                <li key={p.id}>
+                  <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-black/[.03] dark:hover:bg-white/[.06]">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleCollaborator(p.id)}
+                      className="h-4 w-4 shrink-0 accent-accent"
+                    />
+                    <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-accent-soft">
+                      {avatarUrl && (
+                        <Image src={avatarUrl} alt={p.username} fill className="object-cover" />
+                      )}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium">{p.display_name}</span>
+                      <span className="block truncate text-xs text-muted">@{p.username}</span>
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
       {error && <p className="text-sm text-danger">{error}</p>}
 
