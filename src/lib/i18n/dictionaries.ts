@@ -139,6 +139,8 @@ export const dictionaries = {
       remove: "Çıkar",
       noCandidates: "Eklenebilecek kimse yok. Ortak çalışan eklemek için birini takip et ya da seni takip etsin.",
       noCurrent: "Henüz ortak çalışan yok.",
+      searchPlaceholder: "İsim veya kullanıcı adı ara...",
+      noSearchResults: "Kimse bulunamadı.",
     },
     editCollection: {
       pageTitle: "Koleksiyonu düzenle",
@@ -319,6 +321,8 @@ export const dictionaries = {
       remove: "Remove",
       noCandidates: "No one to add yet. Follow someone or have them follow you to add them as a collaborator.",
       noCurrent: "No collaborators yet.",
+      searchPlaceholder: "Search by name or username...",
+      noSearchResults: "No one found.",
     },
     editCollection: {
       pageTitle: "Edit collection",

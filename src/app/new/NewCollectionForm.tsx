@@ -29,6 +29,15 @@ export default function NewCollectionForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [collaboratorQuery, setCollaboratorQuery] = useState("");
+  const filteredCandidates = candidates.filter((p) => {
+    const q = collaboratorQuery.trim().toLocaleLowerCase("tr");
+    if (!q) return true;
+    return (
+      p.username.toLocaleLowerCase("tr").includes(q) ||
+      p.display_name.toLocaleLowerCase("tr").includes(q)
+    );
+  });
 
   const toggleCollaborator = (id: string) => {
     setSelected((prev) => {
@@ -138,33 +147,44 @@ export default function NewCollectionForm({
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium">{t.collaborators.optionalLabel}</label>
           <p className="text-xs text-muted">{t.collaborators.optionalHint}</p>
-          <ul className="mt-1 flex flex-col gap-1 rounded-xl border border-border p-1.5">
-            {candidates.map((p) => {
-              const avatarUrl = publicImageUrl("avatars", p.avatar_path);
-              const checked = selected.has(p.id);
-              return (
-                <li key={p.id}>
-                  <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-black/[.03] dark:hover:bg-white/[.06]">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleCollaborator(p.id)}
-                      className="h-4 w-4 shrink-0 accent-accent"
-                    />
-                    <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-accent-soft">
-                      {avatarUrl && (
-                        <Image src={avatarUrl} alt={p.username} fill className="object-cover" />
-                      )}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium">{p.display_name}</span>
-                      <span className="block truncate text-xs text-muted">@{p.username}</span>
-                    </span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
+          <input
+            type="text"
+            value={collaboratorQuery}
+            onChange={(e) => setCollaboratorQuery(e.target.value)}
+            placeholder={t.collaborators.searchPlaceholder}
+            className="field py-2 text-sm"
+          />
+          {filteredCandidates.length === 0 ? (
+            <p className="py-2 text-center text-sm text-muted">{t.collaborators.noSearchResults}</p>
+          ) : (
+            <ul className="mt-1 flex max-h-56 flex-col gap-1 overflow-y-auto rounded-xl border border-border p-1.5">
+              {filteredCandidates.map((p) => {
+                const avatarUrl = publicImageUrl("avatars", p.avatar_path);
+                const checked = selected.has(p.id);
+                return (
+                  <li key={p.id}>
+                    <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-black/[.03] dark:hover:bg-white/[.06]">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleCollaborator(p.id)}
+                        className="h-4 w-4 shrink-0 accent-accent"
+                      />
+                      <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-accent-soft">
+                        {avatarUrl && (
+                          <Image src={avatarUrl} alt={p.username} fill className="object-cover" />
+                        )}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium">{p.display_name}</span>
+                        <span className="block truncate text-xs text-muted">@{p.username}</span>
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
       )}
 
