@@ -5,8 +5,13 @@
 <h1 align="center">Collectra</h1>
 
 <p align="center">
-  A social platform for sharing collections — think Instagram, but the unit of content
-  is a collection instead of a single post.
+  <strong>Your collections deserve more than a single post.</strong>
+</p>
+
+<p align="center">
+  A social home for collectors — Lego, vinyl, trading cards, coins, sneakers,
+  whatever you're into. Instead of posting once and moving on, you build a
+  collection that keeps growing, and the people who follow you watch it take shape.
 </p>
 
 <p align="center">
@@ -17,22 +22,34 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
 </p>
 
-## What it does
+## Why Collectra
 
-- **Share any kind of collection** — Lego, trading cards, stamps, coins, vinyl, books,
-  watches, sneakers, and more, organized by category.
-- **Collections grow over time.** Add new photos to an existing collection later instead
-  of it being a one-off post — the item count and feed update as it grows.
-- **Control who sees it.** Each collection is public, visible to followers only, or
-  private.
-- **Explore.** Browse a public feed, filter by category, or visit a collector's profile.
-- **Social layer.** Follow collectors, like and comment on collections.
+Most feeds are built around the single post: you share it, it scrolls away, that's it.
+Collections don't work like that — you find a new piece months later and want it to
+belong with the rest, not buried in a brand new post nobody sees. Collectra treats a
+collection as a living thing: add to it whenever you want, and everyone following
+along sees it grow.
+
+## What you can do
+
+- **Grow a collection over time** — start with a few photos, add more whenever you
+  find something new. The feed and item count update right along with it.
+- **Build it together** — bring in a collaborator (someone you follow, or who follows
+  you) so you're not the only one adding and curating photos.
+- **Pick the cover that fits** — choose which photo represents the collection at a
+  glance, instead of defaulting to whatever you uploaded first.
+- **Share it your way** — public for everyone, followers-only, or just for you.
+- **Explore and connect** — browse by category, follow collectors, like and comment
+  on what you find.
+- **Speak your language** — full Turkish/English support across the app.
+- **Kept civil** — built-in reporting, with automatic moderation that catches abusive
+  comments the moment they're flagged.
 
 ## Stack
 
 Next.js (App Router, TypeScript, Tailwind CSS) with Supabase for auth, Postgres, and
-image storage — visibility rules are enforced at the database level with Row Level
-Security.
+image storage — visibility and permissions are enforced at the database level with
+Row Level Security, right down to who's allowed to touch a shared collection.
 
 ## License
 
