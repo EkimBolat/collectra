@@ -26,6 +26,20 @@ export default async function Navbar() {
           <Link href="/" className="btn btn-ghost hidden sm:inline-flex">
             {t.nav.explore}
           </Link>
+          <Link
+            href="/search"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-black/[.03] dark:hover:bg-white/[.06]"
+            aria-label={t.nav.search}
+            title={t.nav.search}
+          >
+            <svg viewBox="0 0 20 20" className="h-5 w-5 fill-current">
+              <path
+                fillRule="evenodd"
+                d="M13 8.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm-1.06 4.55a6 6 0 111.06-1.06l3.5 3.5a.75.75 0 11-1.06 1.06l-3.5-3.5z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Link>
           {profile ? (
             <>
               <Link href="/new" className="btn btn-primary">

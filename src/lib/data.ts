@@ -41,6 +41,32 @@ export async function getFeedCollections(categorySlug?: string) {
   return (data ?? []) as unknown as CollectionWithRelations[];
 }
 
+export async function searchProfiles(query: string): Promise<FollowListProfile[]> {
+  const supabase = await createClient();
+  const pattern = `%${query}%`;
+  const [byUsername, byName] = await Promise.all([
+    supabase.from("profiles").select("id, username, display_name, avatar_path").ilike("username", pattern).limit(20),
+    supabase.from("profiles").select("id, username, display_name, avatar_path").ilike("display_name", pattern).limit(20),
+  ]);
+
+  const byId = new Map<string, FollowListProfile>();
+  for (const p of [...(byUsername.data ?? []), ...(byName.data ?? [])]) byId.set(p.id, p);
+  return Array.from(byId.values()).slice(0, 20);
+}
+
+export async function searchCollections(query: string): Promise<CollectionWithRelations[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("collections")
+    .select(COLLECTION_SELECT)
+    .ilike("title", `%${query}%`)
+    .order("created_at", { ascending: false })
+    .limit(30);
+
+  if (error) return [];
+  return (data ?? []) as unknown as CollectionWithRelations[];
+}
+
 export async function getCollectionById(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase

@@ -7,6 +7,7 @@ export const dictionaries = {
       signup: "Kayıt ol",
       signOut: "Çıkış yap",
       notifications: "Bildirimler",
+      search: "Ara",
     },
     home: {
       all: "Tümü",
@@ -152,6 +153,13 @@ export const dictionaries = {
       collaboratorAdd: (name: string, title: string) =>
         `${name}, seni "${title}" koleksiyonuna ortak çalışan olarak ekledi.`,
     },
+    search: {
+      placeholder: "Kullanıcı veya koleksiyon ara...",
+      prompt: "Bir şeyler aramaya başla.",
+      empty: (query: string) => `"${query}" için bir şey bulunamadı.`,
+      people: "Kullanıcılar",
+      collections: "Koleksiyonlar",
+    },
     editCollection: {
       pageTitle: "Koleksiyonu düzenle",
       save: "Kaydet",
@@ -199,6 +207,7 @@ export const dictionaries = {
       signup: "Sign up",
       signOut: "Sign out",
       notifications: "Notifications",
+      search: "Search",
     },
     home: {
       all: "All",
@@ -343,6 +352,13 @@ export const dictionaries = {
       comment: (name: string, title: string) => `${name} commented on "${title}".`,
       collaboratorAdd: (name: string, title: string) =>
         `${name} added you as a collaborator on "${title}".`,
+    },
+    search: {
+      placeholder: "Search for people or collections...",
+      prompt: "Start typing to search.",
+      empty: (query: string) => `No results for "${query}".`,
+      people: "People",
+      collections: "Collections",
     },
     editCollection: {
       pageTitle: "Edit collection",
