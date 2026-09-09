@@ -6,6 +6,7 @@ export const dictionaries = {
       login: "Giriş yap",
       signup: "Kayıt ol",
       signOut: "Çıkış yap",
+      notifications: "Bildirimler",
     },
     home: {
       all: "Tümü",
@@ -142,6 +143,15 @@ export const dictionaries = {
       searchPlaceholder: "İsim veya kullanıcı adı ara...",
       noSearchResults: "Kimse bulunamadı.",
     },
+    notifications: {
+      title: "Bildirimler",
+      empty: "Henüz bildirimin yok.",
+      follow: (name: string) => `${name} seni takip etmeye başladı.`,
+      like: (name: string, title: string) => `${name}, "${title}" koleksiyonunu beğendi.`,
+      comment: (name: string, title: string) => `${name}, "${title}" koleksiyonuna yorum yaptı.`,
+      collaboratorAdd: (name: string, title: string) =>
+        `${name}, seni "${title}" koleksiyonuna ortak çalışan olarak ekledi.`,
+    },
     editCollection: {
       pageTitle: "Koleksiyonu düzenle",
       save: "Kaydet",
@@ -188,6 +198,7 @@ export const dictionaries = {
       login: "Log in",
       signup: "Sign up",
       signOut: "Sign out",
+      notifications: "Notifications",
     },
     home: {
       all: "All",
@@ -323,6 +334,15 @@ export const dictionaries = {
       noCurrent: "No collaborators yet.",
       searchPlaceholder: "Search by name or username...",
       noSearchResults: "No one found.",
+    },
+    notifications: {
+      title: "Notifications",
+      empty: "No notifications yet.",
+      follow: (name: string) => `${name} started following you.`,
+      like: (name: string, title: string) => `${name} liked "${title}".`,
+      comment: (name: string, title: string) => `${name} commented on "${title}".`,
+      collaboratorAdd: (name: string, title: string) =>
+        `${name} added you as a collaborator on "${title}".`,
     },
     editCollection: {
       pageTitle: "Edit collection",

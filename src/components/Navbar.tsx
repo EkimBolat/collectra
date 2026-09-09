@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getCurrentProfile } from "@/lib/auth";
+import { getUnreadNotificationCount } from "@/lib/data";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { getDict } from "@/lib/i18n";
 import SignOutButton from "./SignOutButton";
@@ -10,6 +11,7 @@ import StarMark from "./StarMark";
 export default async function Navbar() {
   const [profile, { t }] = await Promise.all([getCurrentProfile(), getDict()]);
   const avatarUrl = profile ? publicImageUrl("avatars", profile.avatar_path) : null;
+  const unreadCount = profile ? await getUnreadNotificationCount(profile.id) : 0;
 
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-background/85 backdrop-blur">
@@ -29,6 +31,21 @@ export default async function Navbar() {
               <Link href="/new" className="btn btn-primary">
                 <span className="text-base leading-none">+</span>
                 <span className="hidden sm:inline">{t.nav.newCollection}</span>
+              </Link>
+              <Link
+                href="/notifications"
+                className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-black/[.03] dark:hover:bg-white/[.06]"
+                aria-label={t.nav.notifications}
+                title={t.nav.notifications}
+              >
+                <svg viewBox="0 0 20 20" className="h-5 w-5 fill-current">
+                  <path d="M10 1.5a5.5 5.5 0 00-5.5 5.5v2.6c0 .55-.2 1.08-.56 1.5l-1.02 1.18c-.68.79-.13 2.02.9 2.02h12.36c1.03 0 1.58-1.23.9-2.02l-1.02-1.18a2.3 2.3 0 01-.56-1.5V7A5.5 5.5 0 0010 1.5zM8.1 17.1a1.9 1.9 0 003.8 0H8.1z" />
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-none text-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </Link>
               <Link
                 href={`/u/${profile.username}`}

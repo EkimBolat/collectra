@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getDict } from "@/lib/i18n";
+import { createNotification } from "@/lib/notifications";
 import type { CollectionVisibility } from "@/lib/types";
 
 export async function addComment(collectionId: string, formData: FormData) {
@@ -22,6 +23,21 @@ export async function addComment(collectionId: string, formData: FormData) {
     .insert({ collection_id: collectionId, user_id: user.id, body });
 
   if (error) return { error: t.collection.commentError };
+
+  const { data: collection } = await supabase
+    .from("collections")
+    .select("owner_id")
+    .eq("id", collectionId)
+    .single();
+  if (collection) {
+    await createNotification({
+      supabase,
+      recipientId: collection.owner_id,
+      actorId: user.id,
+      type: "comment",
+      collectionId,
+    });
+  }
 
   revalidatePath(`/c/${collectionId}`);
   return { success: true };
@@ -105,6 +121,13 @@ export async function addCollaborator(collectionId: string, userId: string) {
   if (!user) redirect("/login");
 
   await supabase.from("collection_collaborators").insert({ collection_id: collectionId, user_id: userId });
+  await createNotification({
+    supabase,
+    recipientId: userId,
+    actorId: user.id,
+    type: "collaborator_add",
+    collectionId,
+  });
 
   revalidatePath(`/c/${collectionId}`);
 }

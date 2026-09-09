@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createNotification } from "@/lib/notifications";
 
 export async function toggleLike(collectionId: string, path: string) {
   const supabase = await createClient();
@@ -26,6 +27,21 @@ export async function toggleLike(collectionId: string, path: string) {
       .eq("collection_id", collectionId);
   } else {
     await supabase.from("likes").insert({ user_id: user.id, collection_id: collectionId });
+
+    const { data: collection } = await supabase
+      .from("collections")
+      .select("owner_id")
+      .eq("id", collectionId)
+      .single();
+    if (collection) {
+      await createNotification({
+        supabase,
+        recipientId: collection.owner_id,
+        actorId: user.id,
+        type: "like",
+        collectionId,
+      });
+    }
   }
 
   revalidatePath(path);
@@ -81,6 +97,12 @@ export async function toggleFollow(targetUserId: string, path: string) {
       .eq("following_id", targetUserId);
   } else {
     await supabase.from("follows").insert({ follower_id: user.id, following_id: targetUserId });
+    await createNotification({
+      supabase,
+      recipientId: targetUserId,
+      actorId: user.id,
+      type: "follow",
+    });
   }
 
   revalidatePath(path);

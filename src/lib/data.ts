@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { CollectionWithRelations, Category } from "@/lib/types";
+import type { CollectionWithRelations, Category, NotificationType } from "@/lib/types";
 
 const COLLECTION_SELECT = `
   *,
@@ -151,6 +151,41 @@ export async function getCollaborationCandidates(
     if (!exclude.has(p.id)) byId.set(p.id, p);
   }
   return Array.from(byId.values());
+}
+
+export type NotificationWithRelations = {
+  id: string;
+  type: NotificationType;
+  read: boolean;
+  created_at: string;
+  collection_id: string | null;
+  actor: FollowListProfile;
+  collection: { id: string; title: string } | null;
+};
+
+export async function getNotifications(userId: string): Promise<NotificationWithRelations[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("notifications")
+    .select(
+      "id, type, read, created_at, collection_id, actor:profiles!notifications_actor_id_fkey(id, username, display_name, avatar_path), collection:collections(id, title)",
+    )
+    .eq("recipient_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) return [];
+  return data as unknown as NotificationWithRelations[];
+}
+
+export async function getUnreadNotificationCount(userId: string): Promise<number> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("recipient_id", userId)
+    .eq("read", false);
+  return count ?? 0;
 }
 
 export async function isFollowing(followerId: string, followingId: string) {
