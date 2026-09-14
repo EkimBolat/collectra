@@ -12,6 +12,8 @@ export const dictionaries = {
     home: {
       all: "Tümü",
       empty: "Henüz bu kategoride koleksiyon yok. İlk paylaşan sen ol!",
+      loadMore: "Daha fazla göster",
+      loadingMore: "Yükleniyor...",
     },
     auth: {
       loginTitle: "Tekrar hoş geldin",
@@ -212,6 +214,8 @@ export const dictionaries = {
     home: {
       all: "All",
       empty: "No collections in this category yet. Be the first to share one!",
+      loadMore: "Load more",
+      loadingMore: "Loading...",
     },
     auth: {
       loginTitle: "Welcome back",

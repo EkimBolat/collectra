@@ -14,13 +14,18 @@ export async function getCategories(): Promise<Category[]> {
   return data ?? [];
 }
 
-export async function getFeedCollections(categorySlug?: string) {
+export const FEED_PAGE_SIZE = 24;
+
+export async function getFeedCollections(
+  categorySlug?: string,
+  offset = 0,
+): Promise<{ items: CollectionWithRelations[]; hasMore: boolean }> {
   const supabase = await createClient();
   let query = supabase
     .from("collections")
     .select(COLLECTION_SELECT)
     .order("created_at", { ascending: false })
-    .limit(30);
+    .range(offset, offset + FEED_PAGE_SIZE);
 
   if (categorySlug) {
     const { data: category } = await supabase
@@ -28,17 +33,19 @@ export async function getFeedCollections(categorySlug?: string) {
       .select("id")
       .eq("slug", categorySlug)
       .single();
-    if (!category) return [];
+    if (!category) return { items: [], hasMore: false };
     query = query.eq("category_id", category.id);
   }
 
   const { data, error } = await query;
   if (error) {
     console.error(error);
-    return [];
+    return { items: [], hasMore: false };
   }
 
-  return (data ?? []) as unknown as CollectionWithRelations[];
+  const rows = (data ?? []) as unknown as CollectionWithRelations[];
+  const hasMore = rows.length > FEED_PAGE_SIZE;
+  return { items: rows.slice(0, FEED_PAGE_SIZE), hasMore };
 }
 
 export async function searchProfiles(query: string): Promise<FollowListProfile[]> {
