@@ -3,7 +3,7 @@ import Image from "next/image";
 import { searchProfiles, searchCollections } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { publicImageUrl } from "@/lib/supabase/storage";
-import CollectionCard from "@/components/CollectionCard";
+import SearchCollectionResults from "@/components/SearchCollectionResults";
 
 export default async function SearchPage({
   searchParams,
@@ -14,11 +14,11 @@ export default async function SearchPage({
   const query = (q ?? "").trim();
   const { t, locale } = await getDict();
 
-  const [profiles, collections] = query
+  const [profiles, collectionResults] = query
     ? await Promise.all([searchProfiles(query), searchCollections(query)])
-    : [[], []];
+    : [[], { items: [], hasMore: false }];
 
-  const hasResults = profiles.length > 0 || collections.length > 0;
+  const hasResults = profiles.length > 0 || collectionResults.items.length > 0;
 
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
@@ -70,14 +70,16 @@ export default async function SearchPage({
             </section>
           )}
 
-          {collections.length > 0 && (
+          {collectionResults.items.length > 0 && (
             <section>
               <h2 className="mb-3 text-sm font-semibold text-muted">{t.search.collections}</h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                {collections.map((c) => (
-                  <CollectionCard key={c.id} collection={c} locale={locale} />
-                ))}
-              </div>
+              <SearchCollectionResults
+                key={query}
+                query={query}
+                initialItems={collectionResults.items}
+                initialHasMore={collectionResults.hasMore}
+                locale={locale}
+              />
             </section>
           )}
         </div>

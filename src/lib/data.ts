@@ -61,17 +61,23 @@ export async function searchProfiles(query: string): Promise<FollowListProfile[]
   return Array.from(byId.values()).slice(0, 20);
 }
 
-export async function searchCollections(query: string): Promise<CollectionWithRelations[]> {
+export async function searchCollections(
+  query: string,
+  offset = 0,
+): Promise<{ items: CollectionWithRelations[]; hasMore: boolean }> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("collections")
     .select(COLLECTION_SELECT)
     .ilike("title", `%${query}%`)
     .order("created_at", { ascending: false })
-    .limit(30);
+    .range(offset, offset + FEED_PAGE_SIZE);
 
-  if (error) return [];
-  return (data ?? []) as unknown as CollectionWithRelations[];
+  if (error) return { items: [], hasMore: false };
+
+  const rows = (data ?? []) as unknown as CollectionWithRelations[];
+  const hasMore = rows.length > FEED_PAGE_SIZE;
+  return { items: rows.slice(0, FEED_PAGE_SIZE), hasMore };
 }
 
 export async function getCollectionById(id: string) {
