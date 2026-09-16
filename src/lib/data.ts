@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { CollectionWithRelations, Category, NotificationType } from "@/lib/types";
 
@@ -80,7 +81,7 @@ export async function searchCollections(
   return { items: rows.slice(0, FEED_PAGE_SIZE), hasMore };
 }
 
-export async function getCollectionById(id: string) {
+export const getCollectionById = cache(async (id: string) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("collections")
@@ -90,7 +91,7 @@ export async function getCollectionById(id: string) {
 
   if (error) return null;
   return data as unknown as CollectionWithRelations;
-}
+});
 
 export async function getProfileByUsername(username: string) {
   const supabase = await createClient();

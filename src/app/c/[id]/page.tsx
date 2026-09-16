@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getCollectionById, getComments, getCollaborators, getCollaborationCandidates } from "@/lib/data";
 import { getCurrentProfile } from "@/lib/auth";
 import { publicImageUrl } from "@/lib/supabase/storage";
+import { getCoverItem } from "@/lib/collection";
 import { getDict, categoryName, collectionTimeLabel } from "@/lib/i18n";
 import LikeButton from "@/components/LikeButton";
 import FollowButton from "@/components/FollowButton";
@@ -13,6 +15,42 @@ import AddItemsForm from "./AddItemsForm";
 import PhotoGrid from "./PhotoGrid";
 import OwnerMenu from "./OwnerMenu";
 import { createClient } from "@/lib/supabase/server";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const collection = await getCollectionById(id);
+  if (!collection) return {};
+
+  const { locale } = await getDict();
+  const cover = getCoverItem(collection);
+  const imageUrl = publicImageUrl("collection-images", cover?.image_path ?? null);
+  const category = categoryName(collection.category.slug, locale, collection.category.name);
+  const description =
+    collection.description?.trim() ||
+    (locale === "tr"
+      ? `@${collection.owner.username} tarafından paylaşılan ${category} koleksiyonu.`
+      : `A ${category} collection shared by @${collection.owner.username}.`);
+  return {
+    title: `${collection.title} — Collectra`,
+    description,
+    openGraph: {
+      title: collection.title,
+      description,
+      type: "article",
+      images: imageUrl ? [{ url: imageUrl }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: collection.title,
+      description,
+      images: imageUrl ? [imageUrl] : [],
+    },
+  };
+}
 
 export default async function CollectionDetailPage({
   params,

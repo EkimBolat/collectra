@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return {
+    metadataBase: new URL("https://collectra-one.vercel.app"),
     title: "Collectra",
     description:
       locale === "tr" ? "Koleksiyonlarını paylaş, keşfet." : "Share your collections, explore others'.",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
+import { getCoverItem } from "@/lib/collection";
 import { categoryName, type Locale } from "@/lib/i18n/client";
 import type { CollectionWithRelations } from "@/lib/types";
 
@@ -11,10 +12,7 @@ export default function CollectionCard({
   collection: CollectionWithRelations;
   locale: Locale;
 }) {
-  const sortedItems = [...collection.items].sort((a, b) => a.position - b.position);
-  const cover =
-    (collection.cover_item_id && sortedItems.find((i) => i.id === collection.cover_item_id)) ||
-    sortedItems[0];
+  const cover = getCoverItem(collection);
   const coverUrl = publicImageUrl("collection-images", cover?.image_path ?? null);
 
   return (
