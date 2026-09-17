@@ -8,6 +8,7 @@ import type { Category, Profile } from "@/lib/types";
 import { categoryName, type Locale } from "@/lib/i18n/client";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { uploadCollectionImages } from "@/lib/supabase/upload";
+import { matchesProfileQuery } from "@/lib/search-match";
 import { addCollaborator } from "@/app/c/[id]/actions";
 import { createCollection } from "./actions";
 
@@ -30,14 +31,7 @@ export default function NewCollectionForm({
   const [pending, setPending] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [collaboratorQuery, setCollaboratorQuery] = useState("");
-  const filteredCandidates = candidates.filter((p) => {
-    const q = collaboratorQuery.trim().toLocaleLowerCase("tr");
-    if (!q) return true;
-    return (
-      p.username.toLocaleLowerCase("tr").includes(q) ||
-      p.display_name.toLocaleLowerCase("tr").includes(q)
-    );
-  });
+  const filteredCandidates = candidates.filter((p) => matchesProfileQuery(p, collaboratorQuery));
 
   const toggleCollaborator = (id: string) => {
     setSelected((prev) => {

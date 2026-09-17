@@ -5,19 +5,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { publicImageUrl } from "@/lib/supabase/storage";
 import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { matchesProfileQuery } from "@/lib/search-match";
 import { addCollaborator, removeCollaborator } from "./actions";
 import type { Profile } from "@/lib/types";
 
 type ListProfile = Pick<Profile, "id" | "username" | "display_name" | "avatar_path">;
-
-function matchesQuery(profile: ListProfile, query: string) {
-  const q = query.trim().toLocaleLowerCase("tr");
-  if (!q) return true;
-  return (
-    profile.username.toLocaleLowerCase("tr").includes(q) ||
-    profile.display_name.toLocaleLowerCase("tr").includes(q)
-  );
-}
 
 function ProfileRow({ profile }: { profile: ListProfile }) {
   const avatarUrl = publicImageUrl("avatars", profile.avatar_path);
@@ -49,7 +41,7 @@ export default function CollaboratorsModal({
   const router = useRouter();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const filteredCandidates = candidates.filter((p) => matchesQuery(p, query));
+  const filteredCandidates = candidates.filter((p) => matchesProfileQuery(p, query));
 
   const handleAdd = async (userId: string) => {
     setPendingId(userId);
