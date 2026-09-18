@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { getLocale } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return {
-    metadataBase: new URL("https://collectra-one.vercel.app"),
+    metadataBase: new URL(SITE_URL),
     title: "Collectra",
     description:
       locale === "tr" ? "Koleksiyonlarını paylaş, keşfet." : "Share your collections, explore others'.",

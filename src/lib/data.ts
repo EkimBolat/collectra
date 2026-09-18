@@ -297,3 +297,27 @@ export async function hasLiked(userId: string, collectionId: string) {
     .maybeSingle();
   return Boolean(data);
 }
+
+// For sitemap.ts — public collections and all profiles are the only pages
+// worth telling search engines about; everything else is behind auth.
+export async function getPublicCollectionUrls(): Promise<{ id: string; updated_at: string }[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("collections")
+    .select("id, updated_at")
+    .eq("visibility", "public")
+    .order("updated_at", { ascending: false })
+    .limit(1000);
+  if (error) return [];
+  return data ?? [];
+}
+
+export async function getAllUsernames(): Promise<{ username: string; created_at: string }[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("username, created_at")
+    .limit(1000);
+  if (error) return [];
+  return data ?? [];
+}
